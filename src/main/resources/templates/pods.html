@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kubernetes Pods</title>
+</head>
+<body>
+    <div th:each="pod : ${pods}">
+        <a th:href="@{/logs(podName=${pod})}" th:text="${pod}"></a>
+    </div>
+</body>
+</html>
