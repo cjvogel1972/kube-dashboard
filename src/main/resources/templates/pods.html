@@ -3,13 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Kubernetes Pods</title>
+    <link href="css/pods.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <div th:each="pod : ${pods}">
-        <a th:href="@{/logs(podName=${pod})}" th:text="${pod}"></a>
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbarHeader">
+            <div></div>
+            <div class="navbar-brand">
+                <span id="podName" th:text="'Pods for ' + ${namespace}"></span>
+            </div>
+        </div>
     </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div th:each="pod : ${pods}">
+            <a th:href="@{/logs(podName=${pod})}" th:text="${pod}"></a>
+        </div>
+    </div>
+</div>
 </body>
 </html>

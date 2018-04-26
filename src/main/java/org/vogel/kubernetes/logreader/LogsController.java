@@ -25,6 +25,7 @@ public class LogsController {
         LOGGER.debug("In listPods with namespace: {}", namespace);
         try {
             model.addAttribute("pods", KubernetesUtils.getPodsNames(namespace));
+            model.addAttribute("namespace", namespace);
             return "pods";
         } catch (IOException | ApiException e) {
             LOGGER.error("Error getting list of pods", e);
@@ -38,6 +39,7 @@ public class LogsController {
         try {
             String logs = KubernetesUtils.getLogs(namespace, podName).replace("\n", "<br>");
             model.addAttribute("logs", logs);
+            model.addAttribute("podName", podName);
             return "logs";
         } catch (IOException | ApiException e) {
             LOGGER.error("Error getting logs for pod {}", podName, e);

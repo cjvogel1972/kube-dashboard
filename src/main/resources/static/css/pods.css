@@ -1,9 +1,5 @@
 @charset "ISO-8859-1";
 
-div.logs {
-    font-family: monospace;
-}
-
 body {
     padding-top: 50px;
 }

@@ -6,8 +6,24 @@
     <link href="css/logs.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script></head>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
 <body>
-    <div th:utext="${logs}"></div>
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbarHeader">
+            <div></div>
+            <div class="navbar-brand">
+                <a href="/"><span class="glyphicon glyphicon-home"></span></a>
+                <span id="podName" th:text="${podName}"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="logs" th:utext="${logs}"></div>
+    </div>
+</div>
 </body>
 </html>
