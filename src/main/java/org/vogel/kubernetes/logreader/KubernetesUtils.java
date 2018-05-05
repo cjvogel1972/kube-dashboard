@@ -20,7 +20,11 @@ public class KubernetesUtils {
 
         CoreV1Api api = new CoreV1Api();
         V1NamespaceList namespaces = api.listNamespace(null, null, null, null, null, null, null, null, null);
-        return namespaces.getItems().stream().map(ns -> ns.getMetadata().getName()).collect(toList());
+        return namespaces.getItems()
+                .stream()
+                .map(ns -> ns.getMetadata()
+                        .getName())
+                .collect(toList());
     }
 
     public static List<Pod> getPodsNames(String namespace) throws IOException, ApiException {
@@ -31,7 +35,10 @@ public class KubernetesUtils {
         V1PodList list =
                 api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null);
 
-        return list.getItems().stream().map(pod -> new Pod(pod)).collect(toList());
+        return list.getItems()
+                .stream()
+                .map(Pod::new)
+                .collect(toList());
     }
 
     public static String getLogs(String namespace, String podName) throws IOException, ApiException {
