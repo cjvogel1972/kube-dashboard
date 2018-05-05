@@ -23,20 +23,15 @@ public class KubernetesUtils {
         return namespaces.getItems().stream().map(ns -> ns.getMetadata().getName()).collect(toList());
     }
 
-    public static List<String> getPodsNames(String namespace) throws IOException, ApiException {
+    public static List<Pod> getPodsNames(String namespace) throws IOException, ApiException {
         ApiClient client = Config.defaultClient();
         Configuration.setDefaultApiClient(client);
 
         CoreV1Api api = new CoreV1Api();
         V1PodList list =
                 api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null);
-//        V1PodList list =
-//                api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null);
-//        for (V1Pod item : list.getItems()) {
-//            System.out.println(item.getMetadata().getName());
-//        }
 
-        return list.getItems().stream().map(pod -> pod.getMetadata().getName()).collect(toList());
+        return list.getItems().stream().map(pod -> new Pod(pod)).collect(toList());
     }
 
     public static String getLogs(String namespace, String podName) throws IOException, ApiException {

@@ -4,7 +4,12 @@ body {
     padding-top: 50px;
 }
 
+table {
+    font-size: 14pt;
+    margin: 10px;
+}
+
 html {
-    pos: relative;
+    position: relative;
     min-height: 100%;
 }
