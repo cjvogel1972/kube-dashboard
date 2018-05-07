@@ -32,8 +32,7 @@ public class KubernetesUtils {
         Configuration.setDefaultApiClient(client);
 
         CoreV1Api api = new CoreV1Api();
-        V1PodList list =
-                api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null);
+        V1PodList list = api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null);
 
         return list.getItems()
                 .stream()
