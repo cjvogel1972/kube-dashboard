@@ -37,9 +37,7 @@ public class LogsController {
     public String showPodLogs(@RequestParam @NotNull String podName, Model model) {
         LOGGER.debug("In showPodLogs with namespace: {} and pod: {}", namespace, podName);
         try {
-            String logs = KubernetesUtils.getLogs(namespace, podName)
-                    .replace("\n", "<br>")
-                    .replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+            String logs = KubernetesUtils.getLogs(namespace, podName);
             model.addAttribute("logs", logs);
             model.addAttribute("podName", podName);
             return "logs";
