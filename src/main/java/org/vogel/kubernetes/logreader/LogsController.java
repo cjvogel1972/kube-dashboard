@@ -20,7 +20,7 @@ public class LogsController {
     @Value("${my.pod.namespace:default}")
     private String namespace;
 
-    @GetMapping("/")
+    @GetMapping("/pods")
     public String listPods(Model model) {
         LOGGER.debug("In listPods with namespace: {}", namespace);
         try {

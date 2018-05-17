@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Kubernetes Dashboard</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/4.1.0/css/bootstrap.css">
+    <script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+    <script src="/webjars/popper.js/1.14.1/umd/popper.js"></script>
+    <script src="/webjars/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#"><img src="/images/kube-logo.svg" width="30" height="30" class="d-inline-block align-top" alt=""> Kubernetes Dashboard</a>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Home</a>
+            </li>
+        </ul>
+        <span class="navbar-text" id="namespace" th:text="${namespace}"></span>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div><a href="/pods">Pods</a></div>
+</div>
+</body>
+</html>
