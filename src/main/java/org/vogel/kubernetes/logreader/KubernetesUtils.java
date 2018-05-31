@@ -40,6 +40,14 @@ public class KubernetesUtils {
                 .collect(toList());
     }
 
+    public static Pod getPod(String namespace, String podName) throws IOException, ApiException {
+        ApiClient client = Config.defaultClient();
+        Configuration.setDefaultApiClient(client);
+
+        CoreV1Api api = new CoreV1Api();
+        return new Pod(api.readNamespacedPod(podName, namespace, null, null, null));
+    }
+
     public static String getPodLogs(String namespace, String podName) throws IOException, ApiException {
         ApiClient client = Config.defaultClient();
         Configuration.setDefaultApiClient(client);

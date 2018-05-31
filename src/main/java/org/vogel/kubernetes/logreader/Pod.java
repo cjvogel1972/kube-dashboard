@@ -6,7 +6,9 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
 import java.util.List;
+import java.util.Map;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.*;
 
 @Getter
@@ -16,6 +18,14 @@ public class Pod {
     private String reason;
     private int restarts;
     private String age;
+    private String namespace;
+    private Integer priority;
+    private String priorityClassName;
+    private String node;
+    private String hostIp;
+    private DateTime startTime;
+    private List<String> labels;
+    private List<String> annotations;
 
     public Pod(V1Pod pod) {
         restarts = 0;
@@ -113,6 +123,31 @@ public class Pod {
         ready = String.format("%d/%d", readyContainers, totalContainers);
         DateTime creationTimestamp = metadata.getCreationTimestamp();
         age = translateTimestamp(creationTimestamp);
+
+        namespace = metadata.getNamespace();
+        priority = podSpec.getPriority();
+        if (priority != null) {
+            priorityClassName = podSpec.getPriorityClassName();
+        }
+        node = podSpec.getNodeName();
+        hostIp = podStatus.getHostIP();
+        startTime = podStatus.getStartTime();
+        labels = printMultiline(metadata.getLabels());
+        annotations = printMultiline(metadata.getAnnotations());
+    }
+
+    private List<String> printMultiline(Map<String, String> data) {
+        List<String> result = null;
+
+        if (data != null && data.size() > 0) {
+            result = data.keySet()
+                    .stream()
+                    .sorted()
+                    .map(key -> String.format("%s=%s", key, data.get(key)))
+                    .collect(toList());
+        }
+
+        return result;
     }
 
     private String translateTimestamp(DateTime timestamp) {

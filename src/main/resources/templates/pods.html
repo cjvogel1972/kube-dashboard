@@ -36,6 +36,7 @@
                 <th>Status</th>
                 <th>Restarts</th>
                 <th>Age</th>
+                <th>Details</th>
                 <th>Logs</th>
             </tr>
             </thead>
@@ -46,6 +47,8 @@
                 <td th:text="${pod.reason}"></td>
                 <td th:text="${pod.restarts}"></td>
                 <td th:text="${pod.age}"></td>
+                <td><a href="#" th:href="@{/pods/{podName}(podName=${pod.name})}"><span
+                        class="fas fa-info-circle"></span></a></td>
                 <td><a href="#" th:href="@{/pods/{podName}/logs(podName=${pod.name})}"><span
                         class="fas fa-file-alt"></span></a></td>
             </tr>

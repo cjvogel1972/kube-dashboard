@@ -33,6 +33,19 @@ public class LogsController {
         }
     }
 
+    @GetMapping("/pods/{podName}")
+    public String describePod(@PathVariable @NotNull String podName, Model model) {
+        LOGGER.debug("In describePod with namespace: {} and pod: {}", namespace, podName);
+        try {
+            model.addAttribute("pod", KubernetesUtils.getPod(namespace, podName));
+            model.addAttribute("podName", podName);
+            return "pod_describe";
+        } catch (IOException | ApiException e) {
+            LOGGER.error("Error getting pod", e);
+            return "error";
+        }
+    }
+
     @GetMapping("/pods/{podName}/logs")
     public String showPodLogs(@PathVariable @NotNull String podName, Model model) {
         LOGGER.debug("In showPodLogs with namespace: {} and pod: {}", namespace, podName);
