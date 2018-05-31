@@ -31,6 +31,8 @@ dependencies {
     compile 'io.kubernetes:client-java:1.0.0-beta3'
     compile 'commons-io:commons-io:2.6'
     compile 'org.webjars:bootstrap:4.1.0'
+    runtime 'org.webjars:font-awesome:5.0.13'
     runtime('org.springframework.boot:spring-boot-devtools')
+    compileOnly 'org.projectlombok:lombok'
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

@@ -9,7 +9,8 @@
     <script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
     <script src="/webjars/popper.js/1.14.1/umd/popper.js"></script>
     <script src="/webjars/bootstrap/4.1.0/js/bootstrap.min.js"></script>
-    <link href="css/pods.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/webjars/font-awesome/5.0.13/web-fonts-with-css/css/fontawesome-all.min.css">
+    <link href="/css/pods.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
@@ -31,15 +32,22 @@
             <thead>
             <tr>
                 <th>Pod Name</th>
-                <th>Image</th>
+                <th>Ready</th>
                 <th>Status</th>
+                <th>Restarts</th>
+                <th>Age</th>
+                <th>Logs</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="pod : ${pods}">
                 <td><a th:href="@{/logs(podName=${pod.name})}" th:text="${pod.name}"></a></td>
-                <td th:text="${pod.image}"></td>
-                <td th:text="${pod.state}"></td>
+                <td th:text="${pod.ready}"></td>
+                <td th:text="${pod.reason}"></td>
+                <td th:text="${pod.restarts}"></td>
+                <td th:text="${pod.age}"></td>
+                <td><a href="#" th:href="@{/logs(podName=${pod.name})}"><span
+                        class="fas fa-file-alt"></span></a></td>
             </tr>
             </tbody>
         </table>

@@ -1,27 +1,123 @@
 package org.vogel.kubernetes.logreader;
 
-import io.kubernetes.client.models.V1Pod;
+import io.kubernetes.client.models.*;
+import lombok.Getter;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
+import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.*;
+
+@Getter
 public class Pod {
     private String name;
-    private String state;
-    private String image;
+    private String ready;
+    private String reason;
+    private int restarts;
+    private String age;
 
     public Pod(V1Pod pod) {
-        name = pod.getMetadata().getName();
-        state = pod.getStatus().getPhase();
-        image = pod.getSpec().getContainers().get(0).getImage();
+        restarts = 0;
+        V1PodSpec podSpec = pod.getSpec();
+        int totalContainers = podSpec.getContainers()
+                .size();
+        int readyContainers = 0;
+
+        V1PodStatus podStatus = pod.getStatus();
+        reason = podStatus.getPhase();
+        if (isNotBlank(podStatus.getReason())) {
+            reason = podStatus.getReason();
+        }
+
+        boolean initializing = false;
+        List<V1ContainerStatus> initContainerStatuses = podStatus.getInitContainerStatuses();
+        if (initContainerStatuses != null) {
+            for (int i = 0; i < initContainerStatuses.size(); i++) {
+                V1ContainerStatus container = initContainerStatuses.get(i);
+                restarts += container.getRestartCount();
+
+                V1ContainerState containerState = container.getState();
+                V1ContainerStateTerminated terminated = containerState.getTerminated();
+                V1ContainerStateWaiting waiting = containerState.getWaiting();
+                if (terminated != null && terminated.getExitCode() == 0) {
+                    continue;
+                } else if (terminated != null) {
+                    // initialization is failed
+                    if (isBlank(terminated.getReason())) {
+                        if (terminated.getSignal() != 0) {
+                            reason = String.format("Init:Signal:%d", terminated.getSignal());
+                        } else {
+                            reason = String.format("Init:ExitCode:%d", terminated.getExitCode());
+                        }
+                    } else {
+                        reason = "Init:" + terminated.getReason();
+                    }
+                    initializing = true;
+                } else if (waiting != null && isNotBlank(waiting.getReason()) && !waiting.getReason()
+                        .equals("PodInitializing")) {
+                    reason = "Init:" + waiting.getReason();
+                    initializing = true;
+                } else {
+                    reason = String.format("Init:%d/%d", i, podSpec.getInitContainers()
+                            .size());
+                    initializing = true;
+                }
+                break;
+            }
+        }
+
+        if (!initializing) {
+            List<V1ContainerStatus> containerStatuses = podStatus.getContainerStatuses();
+            restarts = 0;
+            boolean hasRunning = false;
+            for (int i = containerStatuses.size() - 1; i >= 0; i--) {
+                V1ContainerStatus container = containerStatuses.get(i);
+
+                restarts += container.getRestartCount();
+                V1ContainerState containerState = container.getState();
+                V1ContainerStateTerminated terminated = containerState.getTerminated();
+                V1ContainerStateWaiting waiting = containerState.getWaiting();
+                if (waiting != null && isNotEmpty(waiting.getReason())) {
+                    reason = waiting.getReason();
+                } else if (terminated != null && isNotEmpty(terminated.getReason())) {
+                    reason = terminated.getReason();
+                } else if (terminated != null && isEmpty(terminated.getReason())) {
+                    if (terminated.getSignal() != 0) {
+                        reason = String.format("Signal:%d", terminated.getSignal());
+                    } else {
+                        reason = String.format("ExitCode:%d", terminated.getExitCode());
+                    }
+                } else if (container.isReady() && containerState.getRunning() != null) {
+                    hasRunning = true;
+                    readyContainers++;
+                }
+
+                // change pod status back to "Running" if there is at least one container still reporting as "Running" status
+                if (reason.equals("Completed") && hasRunning) {
+                    reason = "Running";
+                }
+            }
+        }
+
+        V1ObjectMeta metadata = pod.getMetadata();
+        DateTime deletionTimestamp = metadata.getDeletionTimestamp();
+        if (deletionTimestamp != null && podStatus.getReason()
+                .equals("NodeLost")) {
+            reason = "Unknown";
+        } else if (deletionTimestamp != null) {
+            reason = "Terminating";
+        }
+
+        name = metadata.getName();
+        ready = String.format("%d/%d", readyContainers, totalContainers);
+        DateTime creationTimestamp = metadata.getCreationTimestamp();
+        age = translateTimestamp(creationTimestamp);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public String getImage() {
-        return image;
+    private String translateTimestamp(DateTime timestamp) {
+        DateTime now = DateTime.now();
+        Duration duration = new Duration(timestamp, now);
+        return DurationUtil.shortHumanDuration(duration);
     }
 }
