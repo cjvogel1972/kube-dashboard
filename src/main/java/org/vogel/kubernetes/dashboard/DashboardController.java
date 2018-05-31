@@ -1,4 +1,4 @@
-package org.vogel.kubernetes.logreader;
+package org.vogel.kubernetes.dashboard;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

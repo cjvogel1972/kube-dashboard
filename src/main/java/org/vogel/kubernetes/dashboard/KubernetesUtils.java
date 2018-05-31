@@ -1,4 +1,4 @@
-package org.vogel.kubernetes.logreader;
+package org.vogel.kubernetes.dashboard;
 
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;

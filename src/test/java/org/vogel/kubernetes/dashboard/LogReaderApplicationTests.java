@@ -1,4 +1,4 @@
-package org.vogel.kubernetes.logreader;
+package org.vogel.kubernetes.dashboard;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

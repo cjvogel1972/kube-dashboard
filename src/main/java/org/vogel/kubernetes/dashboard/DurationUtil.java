@@ -1,8 +1,8 @@
-package org.vogel.kubernetes.logreader;
+package org.vogel.kubernetes.dashboard;
 
 import org.joda.time.Duration;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
 
 public class DurationUtil {
     public static String shortHumanDuration(Duration d) {
