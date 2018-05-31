@@ -6,7 +6,7 @@ import static java.lang.String.format;
 
 public class DurationUtil {
     public static String shortHumanDuration(Duration d) {
-        String result = "";
+        String result;
 
         if (d.getStandardDays() > 365) {
             result = format("%dy", d.getStandardDays() / 365);

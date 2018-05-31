@@ -9,6 +9,6 @@ body {
 }
 
 html {
-    pos: relative;
+    position: relative;
     min-height: 100%;
 }
