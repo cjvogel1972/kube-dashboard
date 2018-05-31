@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class DashboardController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LogsController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DashboardController.class);
 
     @Value("${my.pod.namespace:default}")
     private String namespace;

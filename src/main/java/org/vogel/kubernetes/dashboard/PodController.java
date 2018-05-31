@@ -13,9 +13,9 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 @Controller
-public class LogsController {
+public class PodController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LogsController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PodController.class);
 
     @Value("${my.pod.namespace:default}")
     private String namespace;
