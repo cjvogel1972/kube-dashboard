@@ -41,12 +41,12 @@
             </thead>
             <tbody>
             <tr th:each="pod : ${pods}">
-                <td><a th:href="@{/logs(podName=${pod.name})}" th:text="${pod.name}"></a></td>
+                <td><a th:href="@{/pods/{podName}/logs(podName=${pod.name})}" th:text="${pod.name}"></a></td>
                 <td th:text="${pod.ready}"></td>
                 <td th:text="${pod.reason}"></td>
                 <td th:text="${pod.restarts}"></td>
                 <td th:text="${pod.age}"></td>
-                <td><a href="#" th:href="@{/logs(podName=${pod.name})}"><span
+                <td><a href="#" th:href="@{/pods/{podName}/logs(podName=${pod.name})}"><span
                         class="fas fa-file-alt"></span></a></td>
             </tr>
             </tbody>

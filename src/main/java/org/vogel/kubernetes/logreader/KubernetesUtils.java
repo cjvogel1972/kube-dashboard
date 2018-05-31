@@ -27,7 +27,7 @@ public class KubernetesUtils {
                 .collect(toList());
     }
 
-    public static List<Pod> getPodsNames(String namespace) throws IOException, ApiException {
+    public static List<Pod> getPods(String namespace) throws IOException, ApiException {
         ApiClient client = Config.defaultClient();
         Configuration.setDefaultApiClient(client);
 
@@ -40,7 +40,7 @@ public class KubernetesUtils {
                 .collect(toList());
     }
 
-    public static String getLogs(String namespace, String podName) throws IOException, ApiException {
+    public static String getPodLogs(String namespace, String podName) throws IOException, ApiException {
         ApiClient client = Config.defaultClient();
         Configuration.setDefaultApiClient(client);
 

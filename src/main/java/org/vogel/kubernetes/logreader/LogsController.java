@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class LogsController {
     public String listPods(Model model) {
         LOGGER.debug("In listPods with namespace: {}", namespace);
         try {
-            model.addAttribute("pods", KubernetesUtils.getPodsNames(namespace));
+            model.addAttribute("pods", KubernetesUtils.getPods(namespace));
             model.addAttribute("namespace", namespace);
             return "pods";
         } catch (IOException | ApiException e) {
@@ -33,11 +33,11 @@ public class LogsController {
         }
     }
 
-    @GetMapping("/logs")
-    public String showPodLogs(@RequestParam @NotNull String podName, Model model) {
+    @GetMapping("/pods/{podName}/logs")
+    public String showPodLogs(@PathVariable @NotNull String podName, Model model) {
         LOGGER.debug("In showPodLogs with namespace: {} and pod: {}", namespace, podName);
         try {
-            String logs = KubernetesUtils.getLogs(namespace, podName);
+            String logs = KubernetesUtils.getPodLogs(namespace, podName);
             model.addAttribute("logs", logs);
             model.addAttribute("podName", podName);
             return "logs";
