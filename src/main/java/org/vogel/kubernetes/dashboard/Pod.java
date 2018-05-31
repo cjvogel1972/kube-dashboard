@@ -7,6 +7,7 @@ import org.joda.time.Duration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.*;
@@ -26,6 +27,14 @@ public class Pod {
     private DateTime startTime;
     private List<String> labels;
     private List<String> annotations;
+    private DateTime deletionTimestamp;
+    private String deletionDuration;
+    private long deletionGracePeriodSeconds;
+    private String status;
+    private String describeReason;
+    private String message;
+    private String podIp;
+    private String controlledBy;
 
     public Pod(V1Pod pod) {
         restarts = 0;
@@ -111,7 +120,7 @@ public class Pod {
         }
 
         V1ObjectMeta metadata = pod.getMetadata();
-        DateTime deletionTimestamp = metadata.getDeletionTimestamp();
+        deletionTimestamp = metadata.getDeletionTimestamp();
         if (deletionTimestamp != null && podStatus.getReason()
                 .equals("NodeLost")) {
             reason = "Unknown";
@@ -134,6 +143,23 @@ public class Pod {
         startTime = podStatus.getStartTime();
         labels = printMultiline(metadata.getLabels());
         annotations = printMultiline(metadata.getAnnotations());
+
+        if (deletionTimestamp != null) {
+            deletionDuration = translateTimestamp(deletionTimestamp);
+            deletionGracePeriodSeconds = metadata.getDeletionGracePeriodSeconds();
+        }
+        status = podStatus.getPhase();
+        describeReason = podStatus.getReason();
+        message = podStatus.getMessage();
+        podIp = podStatus.getPodIP();
+        List<V1OwnerReference> ownerReferences = metadata.getOwnerReferences();
+        Optional<V1OwnerReference> ownerReference = ownerReferences.stream()
+                .filter(V1OwnerReference::isController)
+                .findFirst();
+        if (ownerReference.isPresent()) {
+            V1OwnerReference ref = ownerReference.get();
+            controlledBy = String.format("%s/%s", ref.getKind(), ref.getName());
+        }
     }
 
     private List<String> printMultiline(Map<String, String> data) {

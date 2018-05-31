@@ -72,6 +72,34 @@
                     </ul>
                 </td>
             </tr>
+            <tr th:if="${pod.deletionTimestamp != null}">
+                <td>Status:</td>
+                <td th:text="'Terminating (lasts ' + ${pod.deletionDuration} + ')'"></td>
+            </tr>
+            <tr th:if="${pod.deletionTimestamp != null}">
+                <td>Termination Grace Period:</td>
+                <td th:text="${pod.deletionGracePeriodSeconds}"></td>
+            </tr>
+            <tr th:if="${pod.deletionTimestamp == null}">
+                <td>Status:</td>
+                <td th:text="${pod.status}"></td>
+            </tr>
+            <tr th:unless="${#strings.isEmpty(pod.describeReason)}">
+                <td>Reason:</td>
+                <td th:text="${pod.describeReason}"></td>
+            </tr>
+            <tr th:unless="${#strings.isEmpty(pod.message)}">
+                <td>Message:</td>
+                <td th:text="${pod.message}"></td>
+            </tr>
+            <tr>
+                <td>IP:</td>
+                <td th:text="${pod.podIp}"></td>
+            </tr>
+            <tr th:unless="${#strings.isEmpty(pod.controlledBy)}">
+                <td>Controlled By:</td>
+                <td th:text="${pod.controlledBy}"></td>
+            </tr>
             </tbody>
         </table>
     </div>
