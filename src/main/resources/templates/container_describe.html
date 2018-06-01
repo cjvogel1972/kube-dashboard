@@ -97,10 +97,10 @@
                             <table class="table table-hover">
                                 <tr th:each="env : ${container.envFrom}">
                                     <td th:text="${env.name}"></td>
-                                    <td th:if="${env.prefix == null}" th:text="${env.from}">ConfigMap</td>
+                                    <td th:if="${env.prefix == null}" th:text="${env.from}"></td>
                                     <td th:unless="${env.prefix == null}"
                                         th:text="${env.from} + ' with prefix\'' + ${env.prefix} +'\''"></td>
-                                    <td th:text="'Optional: '${env.optional}"></td>
+                                    <td th:text="'Optional: ' + ${env.optional}"></td>
                                 </tr>
                             </table>
                         </td>
@@ -109,6 +109,15 @@
                         <td>Environment:</td>
                         <td th:if="${#lists.isEmpty(container.env)}">&lt;none&gt;</td>
                         <td th:unless="${#lists.isEmpty(container.env)}">
+                            <table class="table table-hover">
+                                <tr th:each="env : ${container.env}">
+                                    <td th:text="${env.name}"></td>
+                                    <td th:utext="${env.value}"></td>
+                                    <td th:if="${env.optional == null}"></td>
+                                    <td th:unless="${env.optional == null}"
+                                        th:text="'Optional: ' + ${env.optional}"></td>
+                                </tr>
+                            </table>
                             <ul class="multiline">
                                 <li th:each="env : ${container.env}" th:text="${env}"></li>
                             </ul>

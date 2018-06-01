@@ -35,10 +35,15 @@ public class Container {
 
     public Container(V1Container kubeContainer, List<V1ContainerStatus> containerStatuses) {
         name = kubeContainer.getName();
-        Optional<V1ContainerStatus> containerStatus = containerStatuses.stream()
-                .filter(status -> status.getName()
-                        .equals(name))
-                .findFirst();
+        Optional<V1ContainerStatus> containerStatus;
+        if (containerStatuses == null) {
+            containerStatus = Optional.empty();
+        } else {
+            containerStatus = containerStatuses.stream()
+                    .filter(status -> status.getName()
+                            .equals(name))
+                    .findFirst();
+        }
         describeContainerBasicInfo(kubeContainer);
         containerStatus.ifPresent(this::describeContainerBasicStatusInfo);
         describeContainerCommand(kubeContainer);
@@ -138,9 +143,9 @@ public class Container {
             String url;
             V1HTTPGetAction httpGet = probe.getHttpGet();
             if (httpGet.getPort() != null && httpGet.getPort()
-                    .getStrValue()
-                    .length() > 0) {
-                url = String.format("%s://%s:%s/%s", httpGet.getScheme(), httpGet.getHost(), httpGet.getPort(),
+                    .getIntValue() > 0) {
+                url = String.format("%s://%s:%d/%s", httpGet.getScheme(), httpGet.getHost(), httpGet.getPort()
+                                            .getIntValue(),
                                     httpGet.getPath());
             } else {
                 url = String.format("%s://%s/%s", httpGet.getScheme(), httpGet.getHost(), httpGet.getPath());
@@ -151,7 +156,7 @@ public class Container {
             return String.format("tcp-socket %s:%s %s", probe.getTcpSocket()
                     .getHost(), probe.getTcpSocket()
                                          .getPort()
-                                         .getStrValue(), attrs);
+                                         .getIntValue(), attrs);
         }
 
         return String.format("unknown %s", attrs);
@@ -167,14 +172,14 @@ public class Container {
                 from = " ConfigMap";
                 name = env.getConfigMapRef()
                         .getName();
-                optional = env.getConfigMapRef()
-                        .isOptional();
+                optional = Boolean.TRUE.equals(env.getConfigMapRef()
+                                                       .isOptional());
             } else if (env.getSecretRef() != null) {
                 from = " Secret";
                 name = env.getSecretRef()
                         .getName();
-                optional = env.getSecretRef()
-                        .isOptional();
+                optional = Boolean.TRUE.equals(env.getSecretRef()
+                                                       .isOptional());
             }
             if (isNotBlank(name)) {
                 ContainerEnvironmentFrom cef = new ContainerEnvironmentFrom(name, from, optional, prefix);
@@ -206,14 +211,14 @@ public class Container {
                                 .getResource();
                     } else if (envVarValueFrom.getSecretKeyRef() != null) {
                         V1SecretKeySelector secretKeyRef = envVarValueFrom.getSecretKeyRef();
-                        Boolean optional = secretKeyRef.isOptional();
+                        Boolean optional = Boolean.TRUE.equals(secretKeyRef.isOptional());
                         String value = String.format("&lt;set to the key '%s' in secret '%s'&gt;",
                                                      secretKeyRef.getKey(),
                                                      secretKeyRef.getName());
                         containerEnvironment = new ContainerEnvironment(envVar.getName(), value, optional);
                     } else if (envVarValueFrom.getConfigMapKeyRef() != null) {
                         V1ConfigMapKeySelector configMapKeyRef = envVarValueFrom.getConfigMapKeyRef();
-                        Boolean optional = configMapKeyRef.isOptional();
+                        Boolean optional = Boolean.TRUE.equals(configMapKeyRef.isOptional());
                         String value = String.format("&lt;set to the key '%s' in config map '%s'&gt;",
                                                      configMapKeyRef.getKey(),
                                                      configMapKeyRef.getName());
@@ -280,7 +285,7 @@ public class Container {
         List<V1VolumeMount> volumeMounts = kubeContainer.getVolumeMounts();
         for (V1VolumeMount mount : volumeMounts) {
             List<String> flagsList = new ArrayList<>();
-            if (mount.isReadOnly()) {
+            if (Boolean.TRUE.equals(mount.isReadOnly())) {
                 flagsList.add("ro");
             } else {
                 flagsList.add("rw");

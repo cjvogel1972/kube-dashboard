@@ -92,31 +92,33 @@ public class Pod {
         if (!initializing) {
             restarts = 0;
             boolean hasRunning = false;
-            for (int i = containerStatuses.size() - 1; i >= 0; i--) {
-                V1ContainerStatus container = containerStatuses.get(i);
+            if (containerStatuses != null) {
+                for (int i = containerStatuses.size() - 1; i >= 0; i--) {
+                    V1ContainerStatus container = containerStatuses.get(i);
 
-                restarts += container.getRestartCount();
-                V1ContainerState containerState = container.getState();
-                V1ContainerStateTerminated terminated = containerState.getTerminated();
-                V1ContainerStateWaiting waiting = containerState.getWaiting();
-                if (waiting != null && isNotEmpty(waiting.getReason())) {
-                    reason = waiting.getReason();
-                } else if (terminated != null && isNotEmpty(terminated.getReason())) {
-                    reason = terminated.getReason();
-                } else if (terminated != null && isEmpty(terminated.getReason())) {
-                    if (terminated.getSignal() != 0) {
-                        reason = String.format("Signal:%d", terminated.getSignal());
-                    } else {
-                        reason = String.format("ExitCode:%d", terminated.getExitCode());
+                    restarts += container.getRestartCount();
+                    V1ContainerState containerState = container.getState();
+                    V1ContainerStateTerminated terminated = containerState.getTerminated();
+                    V1ContainerStateWaiting waiting = containerState.getWaiting();
+                    if (waiting != null && isNotEmpty(waiting.getReason())) {
+                        reason = waiting.getReason();
+                    } else if (terminated != null && isNotEmpty(terminated.getReason())) {
+                        reason = terminated.getReason();
+                    } else if (terminated != null && isEmpty(terminated.getReason())) {
+                        if (terminated.getSignal() != 0) {
+                            reason = String.format("Signal:%d", terminated.getSignal());
+                        } else {
+                            reason = String.format("ExitCode:%d", terminated.getExitCode());
+                        }
+                    } else if (container.isReady() && containerState.getRunning() != null) {
+                        hasRunning = true;
+                        readyContainers++;
                     }
-                } else if (container.isReady() && containerState.getRunning() != null) {
-                    hasRunning = true;
-                    readyContainers++;
-                }
 
-                // change pod status back to "Running" if there is at least one container still reporting as "Running" status
-                if (reason.equals("Completed") && hasRunning) {
-                    reason = "Running";
+                    // change pod status back to "Running" if there is at least one container still reporting as "Running" status
+                    if (reason.equals("Completed") && hasRunning) {
+                        reason = "Running";
+                    }
                 }
             }
         }
@@ -155,12 +157,14 @@ public class Pod {
         message = podStatus.getMessage();
         podIp = podStatus.getPodIP();
         List<V1OwnerReference> ownerReferences = metadata.getOwnerReferences();
-        Optional<V1OwnerReference> ownerReference = ownerReferences.stream()
-                .filter(V1OwnerReference::isController)
-                .findFirst();
-        if (ownerReference.isPresent()) {
-            V1OwnerReference ref = ownerReference.get();
-            controlledBy = String.format("%s/%s", ref.getKind(), ref.getName());
+        if (ownerReferences != null) {
+            Optional<V1OwnerReference> ownerReference = ownerReferences.stream()
+                    .filter(V1OwnerReference::isController)
+                    .findFirst();
+            if (ownerReference.isPresent()) {
+                V1OwnerReference ref = ownerReference.get();
+                controlledBy = String.format("%s/%s", ref.getKind(), ref.getName());
+            }
         }
 
         List<V1Container> kubeInitContainers = podSpec.getInitContainers();
