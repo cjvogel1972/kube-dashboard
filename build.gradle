@@ -28,7 +28,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile('org.springframework.boot:spring-boot-starter-web')
-    compile 'io.kubernetes:client-java:1.0.0-beta3'
+    compile 'io.kubernetes:client-java:1.0.0'
     compile 'commons-io:commons-io:2.6'
     runtime 'org.webjars:bootstrap:4.1.0'
     runtime 'org.webjars:font-awesome:5.0.13'
