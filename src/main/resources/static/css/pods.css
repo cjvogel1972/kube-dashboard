@@ -19,3 +19,7 @@ html {
     padding-left: 0;
     margin-bottom: 0;
 }
+
+.indent {
+    text-indent: 20px;
+}

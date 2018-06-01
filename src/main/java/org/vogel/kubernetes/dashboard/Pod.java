@@ -35,6 +35,8 @@ public class Pod {
     private String message;
     private String podIp;
     private String controlledBy;
+    private List<Container> initContainers;
+    private List<Container> containers;
 
     public Pod(V1Pod pod) {
         restarts = 0;
@@ -86,8 +88,8 @@ public class Pod {
             }
         }
 
+        List<V1ContainerStatus> containerStatuses = podStatus.getContainerStatuses();
         if (!initializing) {
-            List<V1ContainerStatus> containerStatuses = podStatus.getContainerStatuses();
             restarts = 0;
             boolean hasRunning = false;
             for (int i = containerStatuses.size() - 1; i >= 0; i--) {
@@ -160,6 +162,17 @@ public class Pod {
             V1OwnerReference ref = ownerReference.get();
             controlledBy = String.format("%s/%s", ref.getKind(), ref.getName());
         }
+
+        List<V1Container> kubeInitContainers = podSpec.getInitContainers();
+        if (kubeInitContainers != null) {
+            initContainers = kubeInitContainers.stream()
+                    .map(container -> new Container(container, containerStatuses))
+                    .collect(toList());
+        }
+        containers = podSpec.getContainers()
+                .stream()
+                .map(container -> new Container(container, containerStatuses))
+                .collect(toList());
     }
 
     private List<String> printMultiline(Map<String, String> data) {

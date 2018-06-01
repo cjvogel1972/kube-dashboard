@@ -100,6 +100,14 @@
                 <td>Controlled By:</td>
                 <td th:text="${pod.controlledBy}"></td>
             </tr>
+            <tr th:unless="${#lists.isEmpty(pod.initContainers)}">
+                <td>Init Containers:</td>
+                <td th:insert="container_describe :: container(${pod.initContainers})"></td>
+            </tr>
+            <tr th:unless="${#lists.isEmpty(pod.containers)}">
+                <td>Containers:</td>
+                <td th:insert="container_describe :: container(${pod.containers})"></td>
+            </tr>
             </tbody>
         </table>
     </div>

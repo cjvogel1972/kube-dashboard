@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="state (name, state)">
+    <tr>
+        <td th:text="${name} + ':'"></td>
+        <td th:text="${state.state}"></td>
+    </tr>
+    <tr th:if="${#strings.equals(state.state, 'Running')}">
+        <td class="indent">Started:</td>
+        <td th:text="${#dates.format(state.runningStarted.toDate(), 'EEE, dd MMM yyyy HH:mm:ss Z')}"></td>
+    </tr>
+    <tr th:if="${#strings.equals(state.state, 'Waiting') && !#strings.isEmpty(state.waitingReason)}">
+        <td class="indent">Reason:</td>
+        <td th:text="${state.waitingReason}"></td>
+    </tr>
+    <tr th:if="${#strings.equals(state.state, 'Terminated') && !#strings.isEmpty(state.terminatedReason)}">
+        <td class="indent">Reason:</td>
+        <td th:text="${state.terminatedReason}"></td>
+    </tr>
+    <tr th:if="${#strings.equals(state.state, 'Terminated') && !#strings.isEmpty(state.terminatedMessage)}">
+        <td class="indent">Message:</td>
+        <td th:text="${state.terminatedMessage}"></td>
+    </tr>
+    <tr th:if="${#strings.equals(state.state, 'Terminated')}">
+        <td class="indent">Exit Code:</td>
+        <td th:text="${state.terminatedExitCode}"></td>
+    </tr>
+    <tr th:if="${#strings.equals(state.state, 'Terminated') && !#strings.isEmpty(terminatedSignal)}">
+        <td class="indent">Signal:</td>
+        <td th:text="${state.terminatedSignal}"></td>
+    </tr>
+    <tr th:if="${#strings.equals(state.state, 'Terminated')}">
+        <td class="indent">Started:</td>
+        <td th:text="${#dates.format(state.terminatedStarted.toDate(), 'EEE, dd MMM yyyy HH:mm:ss Z')}"></td>
+    </tr>
+    <tr th:if="${#strings.equals(state.state, 'Terminated')}">
+        <td class="indent">Finished:</td>
+        <td th:text="${#dates.format(state.terminatedFinished.toDate(), 'EEE, dd MMM yyyy HH:mm:ss Z')}"></td>
+    </tr>
+</div>
+</body>
+</html>

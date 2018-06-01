@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="container (containers)">
+    <table th:each="container : ${containers}" class="table table-hover">
+        <tbody>
+        <tr>
+            <td th:text="${container.name}"></td>
+            <td>
+                <table class="table table-hover">
+                    <tbody>
+                    <tr th:unless="${#strings.isEmpty(container.containerId)}">
+                        <td>Container ID:</td>
+                        <td th:text="${container.containerId}"></td>
+                    </tr>
+                    <tr>
+                        <td>Image:</td>
+                        <td th:text="${container.image}"></td>
+                    </tr>
+                    <tr th:unless="${#strings.isEmpty(container.imageId)}">
+                        <td>Image ID:</td>
+                        <td th:text="${container.imageId}"></td>
+                    </tr>
+                    <tr>
+                        <td th:if="${#strings.contains(container.ports, ',')}">Ports</td>
+                        <td th:unless="${#strings.contains(container.ports,' ,')}">Port</td>
+                        <td th:text="${container.ports}"></td>
+                    </tr>
+                    <tr>
+                        <td th:if="${#strings.contains(container.hostPorts, ',')}">Host Ports</td>
+                        <td th:unless="${#strings.contains(container.hostPorts,' ,')}">Host Port</td>
+                        <td th:text="${container.hostPorts}"></td>
+                    </tr>
+                    <tr th:unless="${#lists.isEmpty(container.commands)}">
+                        <td>Command:</td>
+                        <td>
+                            <ul class="multiline">
+                                <li th:each="command : ${container.commands}" th:text="${command}"></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr th:unless="${#lists.isEmpty(container.args)}">
+                        <td>Args:</td>
+                        <td>
+                            <ul class="multiline">
+                                <li th:each="arg : ${container.args}" th:text="${arg}"></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr th:if="${container.state != null}"
+                        th:replace="container_state::state('State', ${container.state})">
+                    </tr>
+                    <tr th:if="${container.lastState != null}"
+                        th:replace="container_state::state('Last State', ${container.lastState})">
+                    </tr>
+                    <tr th:if="${container.ready != null}">
+                        <td>Ready:</td>
+                        <td th:text="${container.ready}"></td>
+                    </tr>
+                    <tr th:if="${container.restartCount != null}">
+                        <td>Restart Count:</td>
+                        <td th:text="${container.restartCount}"></td>
+                    </tr>
+                    <tr th:unless="${#maps.isEmpty(container.limits)}">
+                        <td>Limits:</td>
+                        <td>
+                            <table class="table table-hover">
+                                <tr th:each="limit : ${container.limits}">
+                                    <td th:text="${limit.key}"></td>
+                                    <td th:text="${limit.value}"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr th:unless="${#maps.isEmpty(container.requests)}">
+                        <td>Requests:</td>
+                        <td>
+                            <table class="table table-hover">
+                                <tr th:each="requests : ${container.requests}">
+                                    <td th:text="${requests.key}"></td>
+                                    <td th:text="${requests.value}"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr th:unless="${#strings.isEmpty(container.livenessProbe)}">
+                        <td>Liveness:</td>
+                        <td th:text="${container.livenessProbe}"></td>
+                    </tr>
+                    <tr th:unless="${#strings.isEmpty(container.readinessProbe)}">
+                        <td>Readiness:</td>
+                        <td th:text="${container.readinessProbe}"></td>
+                    </tr>
+                    <tr th:unless="${#lists.isEmpty(container.envFrom)}">
+                        <td>Environment Variables from:</td>
+                        <td>
+                            <table class="table table-hover">
+                                <tr th:each="env : ${container.envFrom}">
+                                    <td th:text="${env.name}"></td>
+                                    <td th:if="${env.prefix == null}" th:text="${env.from}">ConfigMap</td>
+                                    <td th:unless="${env.prefix == null}"
+                                        th:text="${env.from} + ' with prefix\'' + ${env.prefix} +'\''"></td>
+                                    <td th:text="'Optional: '${env.optional}"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Environment:</td>
+                        <td th:if="${#lists.isEmpty(container.env)}">&lt;none&gt;</td>
+                        <td th:unless="${#lists.isEmpty(container.env)}">
+                            <ul class="multiline">
+                                <li th:each="env : ${container.env}" th:text="${env}"></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Mounts:</td>
+                        <td th:if="${#lists.isEmpty(container.mounts)}">&lt;none&gt;</td>
+                        <td th:unless="${#lists.isEmpty(container.mounts)}">
+                            <ul class="multiline">
+                                <li th:each="mount : ${container.mounts}" th:text="${mount}"></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
