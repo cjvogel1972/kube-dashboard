@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.thymeleaf.util.StringUtils;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,6 +39,7 @@ public class Pod {
     private String controlledBy;
     private List<Container> initContainers;
     private List<Container> containers;
+    private Map<String, String> conditions;
 
     public Pod(V1Pod pod) {
         restarts = 0;
@@ -177,6 +179,14 @@ public class Pod {
                 .stream()
                 .map(container -> new Container(container, containerStatuses))
                 .collect(toList());
+
+        if (podStatus.getConditions() != null && podStatus.getConditions()
+                .size() > 0) {
+            conditions = new LinkedHashMap<>();
+            for (V1PodCondition c : podStatus.getConditions()) {
+                conditions.put(c.getType(), c.getStatus());
+            }
+        }
     }
 
     private List<String> printMultiline(Map<String, String> data) {

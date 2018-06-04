@@ -108,6 +108,21 @@
                 <td>Containers:</td>
                 <td th:insert="container_describe :: container(${pod.containers})"></td>
             </tr>
+            <tr th:unless="${#maps.isEmpty(pod.conditions)}">
+                <td>Conditions:</td>
+                <td>
+                    <table class="table table-hover">
+                        <tr>
+                            <td>Type</td>
+                            <td>Status</td>
+                        </tr>
+                        <tr th:each="condition : ${pod.conditions}">
+                            <td th:text="${condition.key}"></td>
+                            <td th:text="${condition.value}"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
