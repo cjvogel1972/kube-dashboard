@@ -4,6 +4,7 @@ import io.kubernetes.client.models.*;
 import lombok.Getter;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -47,8 +48,9 @@ public class Pod {
 
         V1PodStatus podStatus = pod.getStatus();
         reason = podStatus.getPhase();
-        if (isNotBlank(podStatus.getReason())) {
-            reason = podStatus.getReason();
+        describeReason = podStatus.getReason();
+        if (isNotBlank(describeReason)) {
+            reason = describeReason;
         }
 
         boolean initializing = false;
@@ -125,8 +127,7 @@ public class Pod {
 
         V1ObjectMeta metadata = pod.getMetadata();
         deletionTimestamp = metadata.getDeletionTimestamp();
-        if (deletionTimestamp != null && podStatus.getReason()
-                .equals("NodeLost")) {
+        if (deletionTimestamp != null && StringUtils.equals("NodeLost", describeReason)) {
             reason = "Unknown";
         } else if (deletionTimestamp != null) {
             reason = "Terminating";
@@ -153,7 +154,6 @@ public class Pod {
             deletionGracePeriodSeconds = metadata.getDeletionGracePeriodSeconds();
         }
         status = podStatus.getPhase();
-        describeReason = podStatus.getReason();
         message = podStatus.getMessage();
         podIp = podStatus.getPodIP();
         List<V1OwnerReference> ownerReferences = metadata.getOwnerReferences();
