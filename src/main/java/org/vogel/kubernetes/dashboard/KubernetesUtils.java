@@ -4,6 +4,7 @@ import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.Configuration;
 import io.kubernetes.client.apis.CoreV1Api;
+import io.kubernetes.client.models.V1EventList;
 import io.kubernetes.client.models.V1NamespaceList;
 import io.kubernetes.client.models.V1PodList;
 import io.kubernetes.client.util.Config;
@@ -54,5 +55,20 @@ public class KubernetesUtils {
 
         CoreV1Api api = new CoreV1Api();
         return api.readNamespacedPodLog(podName, namespace, null, null, null, "false", null, null, null, null);
+    }
+
+    public static List<Event> getPodEvents(String namespace, String podName) throws IOException, ApiException {
+        ApiClient client = Config.defaultClient();
+        Configuration.setDefaultApiClient(client);
+
+        CoreV1Api api = new CoreV1Api();
+        String filter = String.format("involvedObject.name=%s", podName);
+        V1EventList eventList = api.listNamespacedEvent(namespace, "false", null, filter, null, null, null, null, null,
+                                                        null);
+
+        return eventList.getItems()
+                .stream()
+                .map(Event::new)
+                .collect(toList());
     }
 }

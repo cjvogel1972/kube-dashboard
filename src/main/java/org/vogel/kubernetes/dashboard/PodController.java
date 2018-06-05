@@ -37,6 +37,7 @@ public class PodController {
         try {
             model.addAttribute("pod", KubernetesUtils.getPod(namespace, podName));
             model.addAttribute("podName", podName);
+            model.addAttribute("events", KubernetesUtils.getPodEvents(namespace, podName));
             return "pod_describe";
         } catch (IOException | ApiException e) {
             log.error("Error getting pod", e);

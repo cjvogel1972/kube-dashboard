@@ -167,6 +167,28 @@
                     </ul>
                 </td>
             </tr>
+            <tr>
+                <td>Events:</td>
+                <td th:if="${#lists.isEmpty(events)}">&lt;none&gt;</td>
+                <td th:unless="${#lists.isEmpty(events)}">
+                    <table class="table table-hover">
+                        <tr>
+                            <td>Type</td>
+                            <td>Reason</td>
+                            <td>Age</td>
+                            <td>From</td>
+                            <td>Message</td>
+                        </tr>
+                        <tr th:each="event : ${events}">
+                            <td th:text="${event.type}"></td>
+                            <td th:text="${event.reason}"></td>
+                            <td th:text="${event.interval}"></td>
+                            <td th:text="${event.source}"></td>
+                            <td th:text="${event.message}"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
