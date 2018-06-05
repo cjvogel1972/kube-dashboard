@@ -39,6 +39,9 @@ public class Pod {
     private List<Container> containers;
     private Map<String, String> conditions;
     private Map<String, Map<String, String>> volumes;
+    private String qos;
+    private List<String> nodeSelectors;
+    private List<String> tolerations;
 
     public Pod(V1Pod pod) {
         restarts = 0;
@@ -188,6 +191,33 @@ public class Pod {
         }
 
         describeVolumes(podSpec.getVolumes());
+
+        if (isNotBlank(podStatus.getQosClass())) {
+            qos = podStatus.getQosClass();
+        }
+
+        nodeSelectors = printMultiline(podSpec.getNodeSelector());
+        List<V1Toleration> podSpecTolerations = podSpec.getTolerations();
+        if (podSpecTolerations != null && podSpecTolerations.size() > 0) {
+            tolerations = new ArrayList<>();
+            for (V1Toleration podToleration : podSpecTolerations) {
+                StringBuilder tol = new StringBuilder(podToleration.getKey());
+                if (isNotBlank(podToleration.getValue())) {
+                    tol.append("=")
+                            .append(podToleration.getValue());
+                }
+                if (isNotBlank(podToleration.getEffect())) {
+                    tol.append(":")
+                            .append(podToleration.getEffect());
+                }
+                if (podToleration.getTolerationSeconds() != null) {
+                    tol.append(" for ")
+                            .append(podToleration.getTolerationSeconds())
+                            .append("s");
+                }
+                tolerations.add(tol.toString());
+            }
+        }
     }
 
     private void describeVolumes(List<V1Volume> podVolumes) {

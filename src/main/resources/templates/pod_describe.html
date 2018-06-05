@@ -144,6 +144,29 @@
                     </table>
                 </td>
             </tr>
+            <tr>
+                <td>QoS Class:</td>
+                <td th:if="${pod.qos == null}">&lt;Unknown&gt;></td>
+                <td th:unless="${pod.qos == null}" th:text="${pod.qos}"></td>
+            </tr>
+            <tr>
+                <td>Node-Selectors</td>
+                <td th:if="${pod.nodeSelectors == null}">&lt;none&gt;</td>
+                <td th:unless="${pod.nodeSelectors == null}">
+                    <ul class="multiline">
+                        <li th:each="selector : ${pod.nodeSelectors}" th:text="${selector}"></li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Tolerations:</td>
+                <td th:if="${#lists.isEmpty(pod.tolerations)}">&lt;none&gt;</td>
+                <td th:unless="${#lists.isEmpty(pod.tolerations)}">
+                    <ul class="multiline">
+                        <li th:each="toleration : ${pod.tolerations}" th:text="${toleration}"></li>
+                    </ul>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
