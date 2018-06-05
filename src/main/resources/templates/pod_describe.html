@@ -47,7 +47,7 @@
             </tr>
             <tr>
                 <td>Node:</td>
-                <td th:if="${pod.node == null}">&lt;None&gt;</td>
+                <td th:if="${pod.node == null}">&lt;none&gt;</td>
                 <td th:unless="${pod.node == null}" th:text="${pod.node} + '/' + ${pod.hostIp}"></td>
             </tr>
             <tr th:if="${pod.startTime != null}">
@@ -56,7 +56,7 @@
             </tr>
             <tr>
                 <td>Labels:</td>
-                <td th:if="${pod.labels == null}">&lt;None&gt;</td>
+                <td th:if="${pod.labels == null}">&lt;none&gt;</td>
                 <td th:unless="${pod.labels == null}">
                     <ul class="multiline">
                         <li th:each="label : ${pod.labels}" th:text="${label}"></li>
@@ -65,7 +65,7 @@
             </tr>
             <tr>
                 <td>Annotations:</td>
-                <td th:if="${pod.annotations == null}">&lt;None&gt;</td>
+                <td th:if="${pod.annotations == null}">&lt;none&gt;</td>
                 <td th:unless="${pod.annotations == null}">
                     <ul class="multiline">
                         <li th:each="annotation : ${pod.annotations}" th:text="${annotation}"></li>
@@ -119,6 +119,27 @@
                         <tr th:each="condition : ${pod.conditions}">
                             <td th:text="${condition.key}"></td>
                             <td th:text="${condition.value}"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>Volumes:</td>
+                <td th:if="${pod.volumes == null}">&lt;none&gt;</td>
+                <td th:unless="${pod.volumes == null}">
+                    <table class="table table-hover">
+                        <tr th:each="volume : ${pod.volumes}">
+                            <td th:text="${volume.key}"></td>
+                            <td th:if="${volume.value == null}">&lt;Unknown&gt;></td>
+                            <td th:unless="${volume.value == null}">
+                                <table class="table table-hover">
+                                    <tr th:each="info : ${volume.value}">
+                                        <td th:text="${info.key}"></td>
+                                        <td th:if="${info.value == null}">&lt;none&gt;></td>
+                                        <td th:unless="${info.value == null}" th:text="${info.value}"></td>
+                                    </tr>
+                                </table>
+                            </td>
                         </tr>
                     </table>
                 </td>
