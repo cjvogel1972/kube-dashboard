@@ -19,7 +19,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="#">Home</a>
+                <a class="nav-link" href="#" th:href="@{/namespaces/{ns}(ns=${namespace})}">Home</a>
             </li>
         </ul>
         <span class="navbar-text" id="podName" th:text="'Pods for ' + ${namespace}"></span>

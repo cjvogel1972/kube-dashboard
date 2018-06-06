@@ -46,6 +46,7 @@ public class PodController {
             model.addAttribute("pod", kubeUtils.getPod(namespace, podName));
             model.addAttribute("podName", podName);
             model.addAttribute("events", kubeUtils.getPodEvents(namespace, podName));
+            model.addAttribute("namespace", namespace);
             return "pod_describe";
         } catch (ApiException e) {
             log.error("Error getting pod", e);
@@ -61,6 +62,7 @@ public class PodController {
             String logs = kubeUtils.getPodLogs(namespace, podName);
             model.addAttribute("logs", logs);
             model.addAttribute("podName", podName);
+            model.addAttribute("namespace", namespace);
             return "logs";
         } catch (ApiException e) {
             log.error("Error getting logs for pod {}", podName, e);
