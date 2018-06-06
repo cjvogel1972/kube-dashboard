@@ -70,16 +70,28 @@ public class Container {
     }
 
     private String describeContainerPorts(List<V1ContainerPort> ports) {
-        return ports.stream()
-                .map(port -> String.format("%d/%s", port.getContainerPort(), port.getProtocol()))
-                .collect(joining(","));
+        String result = null;
+
+        if (ports != null) {
+            result = ports.stream()
+                    .map(port -> String.format("%d/%s", port.getContainerPort(), port.getProtocol()))
+                    .collect(joining(","));
+        }
+
+        return result;
     }
 
     private String describeContainerHostPorts(List<V1ContainerPort> ports) {
-        return ports.stream()
-                .map(port -> String.format("%d/%s", port.getHostPort() == null ? 0 : port.getHostPort(),
-                                           port.getProtocol()))
-                .collect(joining(","));
+        String result = null;
+
+        if (ports != null) {
+            result = ports.stream()
+                    .map(port -> String.format("%d/%s", port.getHostPort() == null ? 0 : port.getHostPort(),
+                                               port.getProtocol()))
+                    .collect(joining(","));
+        }
+
+        return result;
     }
 
     private void describeContainerCommand(V1Container kubeContainer) {

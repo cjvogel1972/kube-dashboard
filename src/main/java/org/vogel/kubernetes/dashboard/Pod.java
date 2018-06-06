@@ -201,7 +201,8 @@ public class Pod {
         if (podSpecTolerations != null && podSpecTolerations.size() > 0) {
             tolerations = new ArrayList<>();
             for (V1Toleration podToleration : podSpecTolerations) {
-                StringBuilder tol = new StringBuilder(podToleration.getKey());
+                StringBuilder tol = new StringBuilder();
+                tol.append(podToleration.getKey());
                 if (isNotBlank(podToleration.getValue())) {
                     tol.append("=")
                             .append(podToleration.getValue());
