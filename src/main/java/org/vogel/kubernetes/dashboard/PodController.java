@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
 
 @Slf4j
 @Controller
@@ -18,14 +17,20 @@ public class PodController {
     @Value("${my.pod.namespace:default}")
     private String namespace;
 
+    private KubernetesUtils kubeUtils;
+
+    public PodController(KubernetesUtils kubeUtils) {
+        this.kubeUtils = kubeUtils;
+    }
+
     @GetMapping("/pods")
     public String listPods(Model model) {
         log.debug("In listPods with namespace: {}", namespace);
         try {
-            model.addAttribute("pods", KubernetesUtils.getPods(namespace));
+            model.addAttribute("pods", kubeUtils.getPods(namespace));
             model.addAttribute("namespace", namespace);
             return "pods";
-        } catch (IOException | ApiException e) {
+        } catch (ApiException e) {
             log.error("Error getting list of pods", e);
             return "error";
         }
@@ -35,11 +40,11 @@ public class PodController {
     public String describePod(@PathVariable @NotNull String podName, Model model) {
         log.debug("In describePod with namespace: {} and pod: {}", namespace, podName);
         try {
-            model.addAttribute("pod", KubernetesUtils.getPod(namespace, podName));
+            model.addAttribute("pod", kubeUtils.getPod(namespace, podName));
             model.addAttribute("podName", podName);
-            model.addAttribute("events", KubernetesUtils.getPodEvents(namespace, podName));
+            model.addAttribute("events", kubeUtils.getPodEvents(namespace, podName));
             return "pod_describe";
-        } catch (IOException | ApiException e) {
+        } catch (ApiException e) {
             log.error("Error getting pod", e);
             return "error";
         }
@@ -49,11 +54,11 @@ public class PodController {
     public String showPodLogs(@PathVariable @NotNull String podName, Model model) {
         log.debug("In showPodLogs with namespace: {} and pod: {}", namespace, podName);
         try {
-            String logs = KubernetesUtils.getPodLogs(namespace, podName);
+            String logs = kubeUtils.getPodLogs(namespace, podName);
             model.addAttribute("logs", logs);
             model.addAttribute("podName", podName);
             return "logs";
-        } catch (IOException | ApiException e) {
+        } catch (ApiException e) {
             log.error("Error getting logs for pod {}", podName, e);
             return "error";
         }
