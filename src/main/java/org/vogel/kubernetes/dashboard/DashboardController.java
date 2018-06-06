@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Controller
 public class DashboardController {
 
-    @Value("${my.pod.defaultNamespace:default}")
+    @Value("${my.pod.namespace:default}")
     private String defaultNamespace;
 
     private KubernetesUtils kubernetesUtils;
