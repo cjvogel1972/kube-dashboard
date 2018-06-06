@@ -26,6 +26,7 @@ public class KubernetesUtils {
     public List<String> getNamespaces() throws ApiException {
         CoreV1Api api = new CoreV1Api();
         V1NamespaceList namespaces = api.listNamespace(null, null, null, null, null, null, null, null, null);
+
         return namespaces.getItems()
                 .stream()
                 .map(ns -> ns.getMetadata()
@@ -45,11 +46,13 @@ public class KubernetesUtils {
 
     public Pod getPod(String namespace, String podName) throws ApiException {
         CoreV1Api api = new CoreV1Api();
+
         return new Pod(api.readNamespacedPod(podName, namespace, null, null, null));
     }
 
     public String getPodLogs(String namespace, String podName) throws ApiException {
         CoreV1Api api = new CoreV1Api();
+
         return api.readNamespacedPodLog(podName, namespace, null, null, null, "false", null, null, null, null);
     }
 
