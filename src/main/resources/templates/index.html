@@ -24,7 +24,7 @@
     </div>
 </nav>
 <div class="container-fluid">
-    <div><a href="/pods">Pods</a></div>
+    <div><a th:href="@{/namespaces/{namespace}/pods(namespace=${namespace})}">Pods</a></div>
 </div>
 </body>
 </html>

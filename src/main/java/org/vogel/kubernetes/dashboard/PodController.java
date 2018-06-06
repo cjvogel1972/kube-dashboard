@@ -7,15 +7,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.constraints.NotNull;
 
 @Slf4j
 @Controller
+@RequestMapping("/namespaces/{namespace}")
 public class PodController {
 
-    @Value("${my.pod.namespace:default}")
-    private String namespace;
+    @Value("${my.pod.defaultNamespace:default}")
+    private String defaultNamespace;
 
     private KubernetesUtils kubeUtils;
 
@@ -24,7 +26,7 @@ public class PodController {
     }
 
     @GetMapping("/pods")
-    public String listPods(Model model) {
+    public String listPods(Model model, @PathVariable("namespace") String namespace) {
         log.debug("In listPods with namespace: {}", namespace);
         try {
             model.addAttribute("pods", kubeUtils.getPods(namespace));
@@ -37,7 +39,8 @@ public class PodController {
     }
 
     @GetMapping("/pods/{podName}")
-    public String describePod(@PathVariable @NotNull String podName, Model model) {
+    public String describePod(Model model, @PathVariable("namespace") @NotNull String namespace,
+                              @PathVariable @NotNull String podName) {
         log.debug("In describePod with namespace: {} and pod: {}", namespace, podName);
         try {
             model.addAttribute("pod", kubeUtils.getPod(namespace, podName));
@@ -51,7 +54,8 @@ public class PodController {
     }
 
     @GetMapping("/pods/{podName}/logs")
-    public String showPodLogs(@PathVariable @NotNull String podName, Model model) {
+    public String showPodLogs(Model model, @PathVariable("namespace") @NotNull String namespace,
+                              @PathVariable @NotNull String podName) {
         log.debug("In showPodLogs with namespace: {} and pod: {}", namespace, podName);
         try {
             String logs = kubeUtils.getPodLogs(namespace, podName);
