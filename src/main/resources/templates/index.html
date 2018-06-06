@@ -12,15 +12,28 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#"><img src="/images/kube-logo.svg" width="30" height="30" class="d-inline-block align-top" alt=""> Kubernetes Dashboard</a>
+    <a class="navbar-brand" href="#">
+        <img src="/images/kube-logo.svg" width="30" height="30" class="d-inline-block align-top" alt="">Kubernetes
+        Dashboard</a>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
                 <a class="nav-link" href="#">Home</a>
             </li>
+
+            <li class="nav-item dropdown" id="namespace">
+                <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarDropdown"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                   th:text="'Namespace: ' + ${namespace}"></a>
+
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="#" th:href="@{/namespaces/{namespace}(namespace=${ns})}"
+                       th:each="ns : ${namespaces}"
+                       th:text="${ns}"></a>
+                </div>
+            </li>
         </ul>
-        <span class="navbar-text" id="namespace" th:text="${namespace}"></span>
     </div>
 </nav>
 <div class="container-fluid">

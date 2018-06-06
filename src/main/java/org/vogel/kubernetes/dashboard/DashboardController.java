@@ -1,5 +1,6 @@
 package org.vogel.kubernetes.dashboard;
 
+import io.kubernetes.client.ApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -14,17 +15,28 @@ public class DashboardController {
     @Value("${my.pod.defaultNamespace:default}")
     private String defaultNamespace;
 
+    private KubernetesUtils kubernetesUtils;
+
+    public DashboardController(KubernetesUtils kubernetesUtils) {
+        this.kubernetesUtils = kubernetesUtils;
+    }
+
     @GetMapping("/")
     public String index(Model model) {
         log.debug("In index with defaultNamespace: {}", defaultNamespace);
-        model.addAttribute("namespace", defaultNamespace);
-        return "index";
+        return namespace(model, defaultNamespace);
     }
 
     @GetMapping("/namespaces/{namespace}")
     public String namespace(Model model, @PathVariable String namespace) {
         log.debug("In namespace with namespace: {}", namespace);
-        model.addAttribute("namespace", defaultNamespace);
+        try {
+            model.addAttribute("namespace", namespace);
+            model.addAttribute("namespaces", kubernetesUtils.getNamespaces());
+        } catch (ApiException e) {
+            log.error("Error getting list of namespaces", e);
+            return "error";
+        }
         return "index";
     }
 }
