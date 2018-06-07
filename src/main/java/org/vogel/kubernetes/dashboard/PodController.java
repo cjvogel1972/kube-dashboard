@@ -34,6 +34,7 @@ public class PodController {
         try {
             model.addAttribute("pods", kubeUtils.getPods(namespace));
             model.addAttribute("namespace", namespace);
+            model.addAttribute("namespaces", kubeUtils.getNamespaces());
             return "pods";
         } catch (ApiException e) {
             log.error("Error getting list of pods", e);
