@@ -21,6 +21,9 @@
             <li class="nav-item active">
                 <a class="nav-link" href="#" th:href="@{/namespaces/{ns}(ns=${namespace})}">Home</a>
             </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#" th:href="@{/namespaces/{ns}/pods(ns=${namespace})}">Pods</a>
+            </li>
         </ul>
         <span class="navbar-text" id="podName" th:text="'Kubernetes Pod ' + ${podName}"></span>
     </div>
