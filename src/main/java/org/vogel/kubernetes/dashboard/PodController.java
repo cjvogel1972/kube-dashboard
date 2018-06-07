@@ -2,7 +2,6 @@ package org.vogel.kubernetes.dashboard;
 
 import io.kubernetes.client.ApiException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,9 +17,6 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/namespaces/{namespace}")
 public class PodController {
-
-    @Value("${my.pod.defaultNamespace:default}")
-    private String defaultNamespace;
 
     private KubernetesUtils kubeUtils;
 
