@@ -26,9 +26,7 @@
     </div>
 </nav>
 <div class="container-fluid">
-    <div class="row">
-        <pre class="logs" th:utext="${logs}"></pre>
-    </div>
+    <div class="row logs" th:each="line : ${logs}" th:text="${line}"></div>
 </div>
 </body>
 </html>
