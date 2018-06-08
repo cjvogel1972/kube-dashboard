@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
-@RequestMapping("/namespaces/{namespace}")
+@RequestMapping("/namespaces/{namespace}/pods")
 public class PodController {
 
     private KubernetesUtils kubeUtils;
@@ -24,7 +24,7 @@ public class PodController {
         this.kubeUtils = kubeUtils;
     }
 
-    @GetMapping("/pods")
+    @GetMapping
     public String listPods(Model model, @PathVariable("namespace") String namespace) {
         log.debug("In listPods with namespace: {}", namespace);
         try {
@@ -38,7 +38,7 @@ public class PodController {
         }
     }
 
-    @GetMapping("/pods/{podName}")
+    @GetMapping("/{podName}")
     public String describePod(Model model, @PathVariable("namespace") @NotNull String namespace,
                               @PathVariable @NotNull String podName) {
         log.debug("In describePod with namespace: {} and pod: {}", namespace, podName);
@@ -54,7 +54,7 @@ public class PodController {
         }
     }
 
-    @GetMapping("/pods/{podName}/logs")
+    @GetMapping("/{podName}/logs")
     public String showPodLogs(Model model, @PathVariable("namespace") @NotNull String namespace,
                               @PathVariable @NotNull String podName) {
         log.debug("In showPodLogs with namespace: {} and pod: {}", namespace, podName);
