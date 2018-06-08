@@ -3,10 +3,12 @@ package org.vogel.kubernetes.dashboard;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.Configuration;
+import io.kubernetes.client.apis.AppsV1beta2Api;
 import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.models.V1EventList;
 import io.kubernetes.client.models.V1NamespaceList;
 import io.kubernetes.client.models.V1PodList;
+import io.kubernetes.client.models.V1beta2ReplicaSetList;
 import io.kubernetes.client.util.Config;
 import org.springframework.stereotype.Component;
 
@@ -65,6 +67,18 @@ public class KubernetesUtils {
         return eventList.getItems()
                 .stream()
                 .map(Event::new)
+                .collect(toList());
+    }
+
+    public List<ReplicaSet> getReplicaSets(String namespace) throws ApiException {
+        AppsV1beta2Api api = new AppsV1beta2Api();
+
+        V1beta2ReplicaSetList list = api.listNamespacedReplicaSet(namespace, "false", null, null, null, null, null,
+                                                                  null, null, null);
+
+        return list.getItems()
+                .stream()
+                .map(ReplicaSet::new)
                 .collect(toList());
     }
 }
