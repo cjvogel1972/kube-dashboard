@@ -143,4 +143,16 @@ public class KubernetesUtils {
 
         return new PodStatus(running, waiting, succeeded, failed);
     }
+
+    public List<Deployment> getDeployments(String namespace) throws ApiException {
+        AppsV1beta2Api api = new AppsV1beta2Api();
+
+        V1beta2DeploymentList deploymentList = api.listNamespacedDeployment(namespace, "false", null, null, null, null,
+                                                                            null,
+                                                                            null, null, null);
+        return deploymentList.getItems()
+                .stream()
+                .map(Deployment::new)
+                .collect(toList());
+    }
 }
