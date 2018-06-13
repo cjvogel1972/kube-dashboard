@@ -295,19 +295,21 @@ public class Container {
 
     private void describeContainerVolumes(V1Container kubeContainer) {
         List<V1VolumeMount> volumeMounts = kubeContainer.getVolumeMounts();
-        for (V1VolumeMount mount : volumeMounts) {
-            List<String> flagsList = new ArrayList<>();
-            if (Boolean.TRUE.equals(mount.isReadOnly())) {
-                flagsList.add("ro");
-            } else {
-                flagsList.add("rw");
+        if (volumeMounts != null) {
+            for (V1VolumeMount mount : volumeMounts) {
+                List<String> flagsList = new ArrayList<>();
+                if (Boolean.TRUE.equals(mount.isReadOnly())) {
+                    flagsList.add("ro");
+                } else {
+                    flagsList.add("rw");
+                }
+                if (isNotBlank(mount.getSubPath())) {
+                    flagsList.add(String.format("path=%s", mount.getSubPath()));
+                }
+                String flags = flagsList.stream()
+                        .collect(joining(","));
+                mounts.add(String.format("%s from %s (%s)", mount.getMountPath(), mount.getName(), flags));
             }
-            if (isNotBlank(mount.getSubPath())) {
-                flagsList.add(String.format("path=%s", mount.getSubPath()));
-            }
-            String flags = flagsList.stream()
-                    .collect(joining(","));
-            mounts.add(String.format("%s from %s (%s)", mount.getMountPath(), mount.getName(), flags));
         }
     }
 }
