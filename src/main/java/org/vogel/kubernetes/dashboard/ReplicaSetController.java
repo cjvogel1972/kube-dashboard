@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.validation.constraints.NotNull;
+
 @Slf4j
 @Controller
 @RequestMapping("/namespaces/{namespace}/replicasets")
@@ -29,6 +31,21 @@ public class ReplicaSetController {
             return "replica_sets";
         } catch (ApiException e) {
             log.error("Error getting list of replica sets", e);
+            return "error";
+        }
+    }
+
+    @GetMapping("/{replicaSetName}")
+    public String describeReplicaSet(Model model, @PathVariable("namespace") @NotNull String namespace,
+                                     @PathVariable @NotNull String replicaSetName) {
+        log.debug("In describeReplicaSet with namespace: {} and replica set: {}", namespace, replicaSetName);
+        try {
+            model.addAttribute("replicaSet", kubeUtils.getReplicaSet(namespace, replicaSetName));
+            model.addAttribute("replicaSetName", replicaSetName);
+            model.addAttribute("events", kubeUtils.getReplicaSetEvents(namespace, replicaSetName));
+            return "replica_set_describe";
+        } catch (ApiException e) {
+            log.error("Error getting replica set", e);
             return "error";
         }
     }

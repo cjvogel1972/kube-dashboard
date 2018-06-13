@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="template (template)">
+    <tr>
+        <td>Pod Template:</td>
+        <td th:if="${template} == null">&lt;unset&gt;</td>
+        <td th:unless="${template} == null">
+            <table class="table table-hover">
+                <tr>
+                    <td>Labels:</td>
+                    <td th:if="${template.labels} == null">&lt;none&gt;</td>
+                    <td th:unless="${template.labels} == null">
+                        <ul class="multiline">
+                            <li th:each="label : ${template.labels}" th:text="${label}"></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr th:unless="${template.annotations} == null">
+                    <td>Annotations:</td>
+                    <td>
+                        <ul class="multiline">
+                            <li th:each="annotation : ${template.annotations}" th:text="${annotation}"></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr th:unless="${#strings.isEmpty(template.serviceAccountName)}">
+                    <td>Service Account:</td>
+                    <td th:text="${template.serviceAccountName}"></td>
+                </tr>
+                <tr th:unless="${#lists.isEmpty(template.initContainers)}">
+                    <td>Init Containers:</td>
+                    <td th:insert="container_describe :: container(${template.initContainers})"></td>
+                </tr>
+                <tr th:unless="${#lists.isEmpty(template.containers)}">
+                    <td>Containers:</td>
+                    <td th:insert="container_describe :: container(${template.containers})"></td>
+                </tr>
+                <tr th:replace="volume::volume(${template.volumes})">
+                </tr>
+            </table>
+        </td>
+    </tr>
+</div>
+</body>
+</html>
