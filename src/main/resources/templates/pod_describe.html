@@ -40,27 +40,27 @@
                 <td>Namespace:</td>
                 <td th:text="${pod.namespace}"></td>
             </tr>
-            <tr th:if="${pod.priority != null}">
+            <tr th:if="${pod.priority} != null">
                 <td>Priority</td>
                 <td th:text="${pod.priority}"></td>
             </tr>
-            <tr th:if="${pod.priority != null}">
+            <tr th:if="${pod.priority} != null">
                 <td>PriorityClassName</td>
                 <td th:text="((${pod.priorityClassName} == null) ? '' : ${pod.priorityClassName})"></td>
             </tr>
             <tr>
                 <td>Node:</td>
-                <td th:if="${pod.node == null}">&lt;none&gt;</td>
-                <td th:unless="${pod.node == null}" th:text="${pod.node} + '/' + ${pod.hostIp}"></td>
+                <td th:if="${pod.node} == null">&lt;none&gt;</td>
+                <td th:unless="${pod.node} == null" th:text="${pod.node} + '/' + ${pod.hostIp}"></td>
             </tr>
-            <tr th:if="${pod.startTime != null}">
+            <tr th:if="${pod.startTime} != null">
                 <td>Start Time:</td>
                 <td th:text="${#dates.format(pod.startTime.toDate(), 'EEE, dd MMM yyyy HH:mm:ss Z')}"></td>
             </tr>
             <tr>
                 <td>Labels:</td>
-                <td th:if="${pod.labels == null}">&lt;none&gt;</td>
-                <td th:unless="${pod.labels == null}">
+                <td th:if="${pod.labels} == null">&lt;none&gt;</td>
+                <td th:unless="${pod.labels} == null">
                     <ul class="multiline">
                         <li th:each="label : ${pod.labels}" th:text="${label}"></li>
                     </ul>
@@ -68,22 +68,22 @@
             </tr>
             <tr>
                 <td>Annotations:</td>
-                <td th:if="${pod.annotations == null}">&lt;none&gt;</td>
-                <td th:unless="${pod.annotations == null}">
+                <td th:if="${pod.annotations} == null">&lt;none&gt;</td>
+                <td th:unless="${pod.annotations} == null">
                     <ul class="multiline">
                         <li th:each="annotation : ${pod.annotations}" th:text="${annotation}"></li>
                     </ul>
                 </td>
             </tr>
-            <tr th:if="${pod.deletionTimestamp != null}">
+            <tr th:if="${pod.deletionTimestamp} != null">
                 <td>Status:</td>
                 <td th:text="'Terminating (lasts ' + ${pod.deletionDuration} + ')'"></td>
             </tr>
-            <tr th:if="${pod.deletionTimestamp != null}">
+            <tr th:if="${pod.deletionTimestamp} != null">
                 <td>Termination Grace Period:</td>
                 <td th:text="${pod.deletionGracePeriodSeconds}"></td>
             </tr>
-            <tr th:if="${pod.deletionTimestamp == null}">
+            <tr th:if="${pod.deletionTimestamp} == null">
                 <td>Status:</td>
                 <td th:text="${pod.status}"></td>
             </tr>
@@ -126,36 +126,17 @@
                     </table>
                 </td>
             </tr>
-            <tr>
-                <td>Volumes:</td>
-                <td th:if="${pod.volumes == null}">&lt;none&gt;</td>
-                <td th:unless="${pod.volumes == null}">
-                    <table class="table table-hover">
-                        <tr th:each="volume : ${pod.volumes}">
-                            <td th:text="${volume.key}"></td>
-                            <td th:if="${volume.value == null}">&lt;Unknown&gt;></td>
-                            <td th:unless="${volume.value == null}">
-                                <table class="table table-hover">
-                                    <tr th:each="info : ${volume.value}">
-                                        <td th:text="${info.key}"></td>
-                                        <td th:if="${info.value == null}">&lt;none&gt;></td>
-                                        <td th:unless="${info.value == null}" th:text="${info.value}"></td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
+            <tr th:replace="volume::volume(${pod.volumes})">
             </tr>
             <tr>
                 <td>QoS Class:</td>
-                <td th:if="${pod.qos == null}">&lt;Unknown&gt;></td>
-                <td th:unless="${pod.qos == null}" th:text="${pod.qos}"></td>
+                <td th:if="${pod.qos} == null">&lt;Unknown&gt;></td>
+                <td th:unless="${pod.qos} == null" th:text="${pod.qos}"></td>
             </tr>
             <tr>
                 <td>Node-Selectors</td>
-                <td th:if="${pod.nodeSelectors == null}">&lt;none&gt;</td>
-                <td th:unless="${pod.nodeSelectors == null}">
+                <td th:if="${pod.nodeSelectors} == null">&lt;none&gt;</td>
+                <td th:unless="${pod.nodeSelectors} == null">
                     <ul class="multiline">
                         <li th:each="selector : ${pod.nodeSelectors}" th:text="${selector}"></li>
                     </ul>
