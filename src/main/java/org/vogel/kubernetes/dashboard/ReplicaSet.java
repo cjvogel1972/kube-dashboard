@@ -33,7 +33,9 @@ public class ReplicaSet {
         name = metadata.getName();
         desired = replicaSetSpec.getReplicas();
         current = replicaSetStatus.getReplicas();
-        ready = replicaSetStatus.getReadyReplicas();
+        if (replicaSetStatus.getReadyReplicas() != null) {
+            ready = replicaSetStatus.getReadyReplicas();
+        }
         age = translateTimestamp(metadata.getCreationTimestamp());
 
         namespace = metadata.getNamespace();
