@@ -24,7 +24,7 @@ public class ReplicaSet {
     private String controlledBy;
     private PodStatus status;
     private PodTemplate podTemplate;
-    private Map<String, String> conditions;
+    private List<ReplicaSetCondition> conditions;
 
     public ReplicaSet(V1beta2ReplicaSet replicaSet) {
         V1ObjectMeta metadata = replicaSet.getMetadata();
@@ -55,9 +55,9 @@ public class ReplicaSet {
 
         if (replicaSetStatus.getConditions() != null && replicaSetStatus.getConditions()
                 .size() > 0) {
-            conditions = new LinkedHashMap<>();
+            conditions = new ArrayList<>();
             for (V1beta2ReplicaSetCondition c : replicaSetStatus.getConditions()) {
-                conditions.put(c.getType(), c.getStatus());
+                conditions.add(new ReplicaSetCondition(c.getType(), c.getStatus(), c.getReason()));
             }
         }
 

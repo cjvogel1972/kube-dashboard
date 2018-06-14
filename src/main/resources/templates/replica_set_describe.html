@@ -76,17 +76,19 @@
             </tr>
             <tr th:replace="pod_template::template(${replicaSet.podTemplate})">
             </tr>
-            <tr th:unless="${#maps.isEmpty(replicaSet.conditions)}">
+            <tr th:unless="${#lists.isEmpty(replicaSet.conditions)}">
                 <td>Conditions:</td>
                 <td>
                     <table class="table table-hover">
                         <tr>
                             <td>Type</td>
                             <td>Status</td>
+                            <td>Reason</td>
                         </tr>
                         <tr th:each="condition : ${replicaSet.conditions}">
-                            <td th:text="${condition.key}"></td>
-                            <td th:text="${condition.value}"></td>
+                            <td th:text="${condition.type}"></td>
+                            <td th:text="${condition.status}"></td>
+                            <td th:text="${condition.reason}"></td>
                         </tr>
                     </table>
                 </td>
