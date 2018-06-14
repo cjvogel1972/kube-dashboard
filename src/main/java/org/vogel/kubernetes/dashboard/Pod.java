@@ -9,7 +9,8 @@ import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.*;
-import static org.vogel.kubernetes.dashboard.DurationUtil.translateTimestamp;
+import static org.vogel.kubernetes.dashboard.FormatUtils.printMultiline;
+import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
 
 @Getter
 public class Pod {
@@ -218,19 +219,5 @@ public class Pod {
                 tolerations.add(tol.toString());
             }
         }
-    }
-
-    private List<String> printMultiline(Map<String, String> data) {
-        List<String> result = null;
-
-        if (data != null && data.size() > 0) {
-            result = data.keySet()
-                    .stream()
-                    .sorted()
-                    .map(key -> String.format("%s=%s", key, data.get(key)))
-                    .collect(toList());
-        }
-
-        return result;
     }
 }

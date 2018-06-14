@@ -9,7 +9,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.vogel.kubernetes.dashboard.DurationUtil.translateTimestamp;
+import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
 
 @Getter
 public class Event {

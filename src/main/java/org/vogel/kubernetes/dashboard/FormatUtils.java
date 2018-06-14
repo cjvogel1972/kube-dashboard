@@ -3,13 +3,31 @@ package org.vogel.kubernetes.dashboard;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
-import static java.lang.String.format;
+import java.util.List;
+import java.util.Map;
 
-public class DurationUtil {
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+
+public class FormatUtils {
     public static String translateTimestamp(DateTime timestamp) {
         DateTime now = DateTime.now();
         Duration duration = new Duration(timestamp, now);
         return shortHumanDuration(duration);
+    }
+
+    public static List<String> printMultiline(Map<String, String> data) {
+        List<String> result = null;
+
+        if (data != null && data.size() > 0) {
+            result = data.keySet()
+                    .stream()
+                    .sorted()
+                    .map(key -> String.format("%s=%s", key, data.get(key)))
+                    .collect(toList());
+        }
+
+        return result;
     }
 
     private static String shortHumanDuration(Duration d) {

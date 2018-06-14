@@ -6,7 +6,7 @@ import io.kubernetes.client.models.V1beta2DeploymentSpec;
 import io.kubernetes.client.models.V1beta2DeploymentStatus;
 import lombok.Getter;
 
-import static org.vogel.kubernetes.dashboard.DurationUtil.translateTimestamp;
+import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
 
 @Getter
 public class Deployment {

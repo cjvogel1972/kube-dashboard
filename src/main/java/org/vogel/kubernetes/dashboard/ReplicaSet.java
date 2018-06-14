@@ -6,8 +6,8 @@ import lombok.Getter;
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static java.util.stream.Collectors.toList;
-import static org.vogel.kubernetes.dashboard.DurationUtil.translateTimestamp;
+import static org.vogel.kubernetes.dashboard.FormatUtils.printMultiline;
+import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
 
 @Getter
 public class ReplicaSet {
@@ -130,20 +130,6 @@ public class ReplicaSet {
             }
         } catch (RequirementException e) {
             result = "<error>";
-        }
-
-        return result;
-    }
-
-    private List<String> printMultiline(Map<String, String> data) {
-        List<String> result = null;
-
-        if (data != null && data.size() > 0) {
-            result = data.keySet()
-                    .stream()
-                    .sorted()
-                    .map(key -> String.format("%s=%s", key, data.get(key)))
-                    .collect(toList());
         }
 
         return result;

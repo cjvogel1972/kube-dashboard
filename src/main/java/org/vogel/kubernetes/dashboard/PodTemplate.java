@@ -7,9 +7,9 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
+import static org.vogel.kubernetes.dashboard.FormatUtils.printMultiline;
 
 @Getter
 public class PodTemplate {
@@ -50,19 +50,5 @@ public class PodTemplate {
 
         volumes = new Volumes(template.getSpec()
                                       .getVolumes());
-    }
-
-    private List<String> printMultiline(Map<String, String> data) {
-        List<String> result = null;
-
-        if (data != null && data.size() > 0) {
-            result = data.keySet()
-                    .stream()
-                    .sorted()
-                    .map(key -> String.format("%s=%s", key, data.get(key)))
-                    .collect(toList());
-        }
-
-        return result;
     }
 }
