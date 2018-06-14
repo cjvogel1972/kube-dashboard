@@ -3,11 +3,11 @@ package org.vogel.kubernetes.dashboard;
 import io.kubernetes.client.models.*;
 import lombok.Getter;
 
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-import static org.vogel.kubernetes.dashboard.FormatUtils.printMultiline;
-import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
+import static org.vogel.kubernetes.dashboard.FormatUtils.*;
 
 @Getter
 public class ReplicaSet {
@@ -65,73 +65,5 @@ public class ReplicaSet {
 
     public void setStatus(PodStatus status) {
         this.status = status;
-    }
-
-    private String formatLabelSelector(@Nullable V1LabelSelector labelSelector) {
-        String result;
-
-        int matchLabelsSize = 0;
-        int matchExpressionsSize = 0;
-        if (labelSelector != null) {
-            if (labelSelector.getMatchLabels() != null) {
-                matchLabelsSize = labelSelector.getMatchLabels()
-                        .size();
-            }
-            if (labelSelector.getMatchExpressions() != null) {
-                matchExpressionsSize = labelSelector.getMatchExpressions()
-                        .size();
-            }
-        }
-
-        try {
-            if (labelSelector == null) {
-                result = "";
-            } else if (matchLabelsSize + matchExpressionsSize == 0) {
-                result = "";
-            } else {
-                Selector selector = new Selector();
-                if (labelSelector.getMatchLabels() != null) {
-                    for (Map.Entry<String, String> entry : labelSelector.getMatchLabels()
-                            .entrySet()) {
-                        List<String> values = Collections.singletonList(entry.getValue());
-                        Requirement requirement = new Requirement(entry.getKey(), "=", values);
-                        selector.add(requirement);
-                    }
-                }
-                if (labelSelector.getMatchExpressions() != null) {
-                    for (V1LabelSelectorRequirement expression : labelSelector.getMatchExpressions()) {
-                        String op;
-                        switch (expression.getOperator()) {
-                            case "In":
-                                op = "in";
-                                break;
-                            case "NotIn":
-                                op = "notin";
-                                break;
-                            case "Exists":
-                                op = "exists";
-                                break;
-                            case "DoesNotExist":
-                                op = "!";
-                                break;
-                            default:
-                                String msg = String.format("%s is not a valid pod selector operator",
-                                                           expression.getOperator());
-                                throw new RequirementException(msg);
-                        }
-                        Requirement requirement = new Requirement(expression.getKey(), op, expression.getValues());
-                        selector.add(requirement);
-                    }
-                }
-                result = selector.string();
-                if (result.length() == 0) {
-                    result = "<none>";
-                }
-            }
-        } catch (RequirementException e) {
-            result = "<error>";
-        }
-
-        return result;
     }
 }

@@ -1,8 +1,12 @@
 package org.vogel.kubernetes.dashboard;
 
+import io.kubernetes.client.models.V1LabelSelector;
+import io.kubernetes.client.models.V1LabelSelectorRequirement;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
+import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +29,74 @@ public class FormatUtils {
                     .sorted()
                     .map(key -> String.format("%s=%s", key, data.get(key)))
                     .collect(toList());
+        }
+
+        return result;
+    }
+
+    public static String formatLabelSelector(@Nullable V1LabelSelector labelSelector) {
+        String result;
+
+        int matchLabelsSize = 0;
+        int matchExpressionsSize = 0;
+        if (labelSelector != null) {
+            if (labelSelector.getMatchLabels() != null) {
+                matchLabelsSize = labelSelector.getMatchLabels()
+                        .size();
+            }
+            if (labelSelector.getMatchExpressions() != null) {
+                matchExpressionsSize = labelSelector.getMatchExpressions()
+                        .size();
+            }
+        }
+
+        try {
+            if (labelSelector == null) {
+                result = "";
+            } else if (matchLabelsSize + matchExpressionsSize == 0) {
+                result = "";
+            } else {
+                Selector selector = new Selector();
+                if (labelSelector.getMatchLabels() != null) {
+                    for (Map.Entry<String, String> entry : labelSelector.getMatchLabels()
+                            .entrySet()) {
+                        List<String> values = Collections.singletonList(entry.getValue());
+                        Requirement requirement = new Requirement(entry.getKey(), "=", values);
+                        selector.add(requirement);
+                    }
+                }
+                if (labelSelector.getMatchExpressions() != null) {
+                    for (V1LabelSelectorRequirement expression : labelSelector.getMatchExpressions()) {
+                        String op;
+                        switch (expression.getOperator()) {
+                            case "In":
+                                op = "in";
+                                break;
+                            case "NotIn":
+                                op = "notin";
+                                break;
+                            case "Exists":
+                                op = "exists";
+                                break;
+                            case "DoesNotExist":
+                                op = "!";
+                                break;
+                            default:
+                                String msg = String.format("%s is not a valid pod selector operator",
+                                                           expression.getOperator());
+                                throw new RequirementException(msg);
+                        }
+                        Requirement requirement = new Requirement(expression.getKey(), op, expression.getValues());
+                        selector.add(requirement);
+                    }
+                }
+                result = selector.string();
+                if (result.length() == 0) {
+                    result = "<none>";
+                }
+            }
+        } catch (RequirementException e) {
+            result = "<error>";
         }
 
         return result;
