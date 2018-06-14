@@ -3,13 +3,13 @@ package org.vogel.kubernetes.dashboard;
 import io.kubernetes.client.models.*;
 import lombok.Getter;
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import org.thymeleaf.util.StringUtils;
 
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.*;
+import static org.vogel.kubernetes.dashboard.DurationUtil.translateTimestamp;
 
 @Getter
 public class Pod {
@@ -232,11 +232,5 @@ public class Pod {
         }
 
         return result;
-    }
-
-    private String translateTimestamp(DateTime timestamp) {
-        DateTime now = DateTime.now();
-        Duration duration = new Duration(timestamp, now);
-        return DurationUtil.shortHumanDuration(duration);
     }
 }

@@ -1,11 +1,18 @@
 package org.vogel.kubernetes.dashboard;
 
+import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
 import static java.lang.String.format;
 
 public class DurationUtil {
-    public static String shortHumanDuration(Duration d) {
+    public static String translateTimestamp(DateTime timestamp) {
+        DateTime now = DateTime.now();
+        Duration duration = new Duration(timestamp, now);
+        return shortHumanDuration(duration);
+    }
+
+    private static String shortHumanDuration(Duration d) {
         String result;
 
         if (d.getStandardDays() > 365) {

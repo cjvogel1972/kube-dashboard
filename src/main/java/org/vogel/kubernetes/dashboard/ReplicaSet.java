@@ -2,13 +2,12 @@ package org.vogel.kubernetes.dashboard;
 
 import io.kubernetes.client.models.*;
 import lombok.Getter;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
+import static org.vogel.kubernetes.dashboard.DurationUtil.translateTimestamp;
 
 @Getter
 public class ReplicaSet {
@@ -148,11 +147,5 @@ public class ReplicaSet {
         }
 
         return result;
-    }
-
-    private String translateTimestamp(DateTime timestamp) {
-        DateTime now = DateTime.now();
-        Duration duration = new Duration(timestamp, now);
-        return DurationUtil.shortHumanDuration(duration);
     }
 }

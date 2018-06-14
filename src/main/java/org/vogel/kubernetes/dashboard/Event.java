@@ -3,14 +3,13 @@ package org.vogel.kubernetes.dashboard;
 import io.kubernetes.client.models.V1Event;
 import io.kubernetes.client.models.V1EventSource;
 import lombok.Getter;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.vogel.kubernetes.dashboard.DurationUtil.translateTimestamp;
 
 @Getter
 public class Event {
@@ -42,11 +41,5 @@ public class Event {
 
         return eventSourceString.stream()
                 .collect(joining(","));
-    }
-
-    private String translateTimestamp(DateTime timestamp) {
-        DateTime now = DateTime.now();
-        Duration duration = new Duration(timestamp, now);
-        return DurationUtil.shortHumanDuration(duration);
     }
 }
