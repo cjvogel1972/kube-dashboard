@@ -71,8 +71,8 @@ public class ReplicaSet {
     private String formatLabelSelector(@Nullable V1LabelSelector labelSelector) {
         String result;
 
-        int matchLabelsSize = -1;
-        int matchExpressionsSize = -1;
+        int matchLabelsSize = 0;
+        int matchExpressionsSize = 0;
         if (labelSelector != null) {
             if (labelSelector.getMatchLabels() != null) {
                 matchLabelsSize = labelSelector.getMatchLabels()
