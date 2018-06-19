@@ -252,4 +252,16 @@ public class KubernetesUtils {
                     .collect(joining(","));
         }
     }
+
+    public List<Service> getServices(String namespace) throws ApiException {
+        CoreV1Api api = new CoreV1Api();
+
+        V1ServiceList serviceList = api.listNamespacedService(namespace, "false", null, null, null, null, null, null,
+                                                              null, null);
+
+        return serviceList.getItems()
+                .stream()
+                .map(Service::new)
+                .collect(toList());
+    }
 }
