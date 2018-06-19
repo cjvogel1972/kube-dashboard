@@ -40,9 +40,12 @@ public class ReplicaSetController {
                                      @PathVariable @NotNull String replicaSetName) {
         log.debug("In describeReplicaSet with namespace: {} and replica set: {}", namespace, replicaSetName);
         try {
-            model.addAttribute("replicaSet", kubeUtils.getReplicaSet(namespace, replicaSetName));
+            ReplicaSet replicaSet = kubeUtils.getReplicaSet(namespace, replicaSetName);
+            model.addAttribute("replicaSet", replicaSet);
             model.addAttribute("replicaSetName", replicaSetName);
-            model.addAttribute("events", kubeUtils.getReplicaSetEvents(namespace, replicaSetName));
+            model.addAttribute("events",
+                               kubeUtils.getEvents(namespace, "ReplicaSet", replicaSetName, replicaSet.getUid()));
+            model.addAttribute("namespace", namespace);
             return "replica_set_describe";
         } catch (ApiException e) {
             log.error("Error getting replica set", e);

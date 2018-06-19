@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.validation.constraints.NotNull;
+
 @Slf4j
 @Controller
 @RequestMapping("/namespaces/{namespace}/deployments")
@@ -29,6 +31,24 @@ public class DeploymentController {
             return "deployments";
         } catch (ApiException e) {
             log.error("Error getting list of deployments", e);
+            return "error";
+        }
+    }
+
+    @GetMapping("/{deploymentName}")
+    public String describeReplicaSet(Model model, @PathVariable("namespace") @NotNull String namespace,
+                                     @PathVariable @NotNull String deploymentName) {
+        log.debug("In describeReplicaSet with namespace: {} and deployment: {}", namespace, deploymentName);
+        try {
+            Deployment deployment = kubeUtils.getDeployment(namespace, deploymentName);
+            model.addAttribute("deployment", deployment);
+            model.addAttribute("deploymentName", deploymentName);
+            model.addAttribute("events",
+                               kubeUtils.getEvents(namespace, "Deployment", deploymentName, deployment.getUid()));
+            model.addAttribute("namespace", namespace);
+            return "deployment_describe";
+        } catch (ApiException e) {
+            log.error("Error getting deployment", e);
             return "error";
         }
     }

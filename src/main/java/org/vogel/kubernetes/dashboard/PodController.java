@@ -43,9 +43,10 @@ public class PodController {
                               @PathVariable @NotNull String podName) {
         log.debug("In describePod with namespace: {} and pod: {}", namespace, podName);
         try {
-            model.addAttribute("pod", kubeUtils.getPod(namespace, podName));
+            Pod pod = kubeUtils.getPod(namespace, podName);
+            model.addAttribute("pod", pod);
             model.addAttribute("podName", podName);
-            model.addAttribute("events", kubeUtils.getPodEvents(namespace, podName));
+            model.addAttribute("events", kubeUtils.getEvents(namespace, "Pod", podName, pod.getUid()));
             model.addAttribute("namespace", namespace);
             return "pod_describe";
         } catch (ApiException e) {

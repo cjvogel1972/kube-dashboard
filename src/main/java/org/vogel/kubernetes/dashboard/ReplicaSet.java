@@ -24,6 +24,7 @@ public class ReplicaSet {
     private PodStatus status;
     private PodTemplate podTemplate;
     private List<ReplicaSetCondition> conditions;
+    private String uid;
 
     public ReplicaSet(V1beta2ReplicaSet replicaSet) {
         V1ObjectMeta metadata = replicaSet.getMetadata();
@@ -61,6 +62,7 @@ public class ReplicaSet {
         }
 
         podTemplate = new PodTemplate(replicaSetSpec.getTemplate());
+        uid = metadata.getUid();
     }
 
     public void setStatus(PodStatus status) {

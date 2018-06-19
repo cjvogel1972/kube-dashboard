@@ -42,6 +42,7 @@ public class Pod {
     private String qos;
     private List<String> nodeSelectors;
     private List<String> tolerations;
+    private String uid;
 
     public Pod(V1Pod pod) {
         restarts = 0;
@@ -219,5 +220,6 @@ public class Pod {
                 tolerations.add(tol.toString());
             }
         }
+        uid = metadata.getUid();
     }
 }
