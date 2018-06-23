@@ -6,6 +6,7 @@ import io.kubernetes.client.ApiException;
 import io.kubernetes.client.Configuration;
 import io.kubernetes.client.apis.AppsV1beta2Api;
 import io.kubernetes.client.apis.CoreV1Api;
+import io.kubernetes.client.apis.ExtensionsV1beta1Api;
 import io.kubernetes.client.models.*;
 import io.kubernetes.client.util.Config;
 import org.springframework.stereotype.Component;
@@ -281,5 +282,18 @@ public class KubernetesUtils {
 
         String filter = String.format("metadata.name=%s", name);
         return api.listNamespacedEndpoints(namespace, "false", null, filter, null, null, null, null, null, null);
+    }
+
+    public List<Ingress> getIngresses(String namespace) throws ApiException {
+        ExtensionsV1beta1Api api = new ExtensionsV1beta1Api();
+
+        V1beta1IngressList ingressList = api.listNamespacedIngress(namespace, "false", null, null, null, null, null,
+                                                                   null,
+                                                                   null, null);
+
+        return ingressList.getItems()
+                .stream()
+                .map(Ingress::new)
+                .collect(toList());
     }
 }

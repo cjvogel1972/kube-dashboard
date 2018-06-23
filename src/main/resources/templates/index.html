@@ -37,6 +37,7 @@
     </div>
 </nav>
 <div class="container-fluid">
+    <div><a th:href="@{/namespaces/{namespace}/ingresses(namespace=${namespace})}">Ingresses</a></div>
     <div><a th:href="@{/namespaces/{namespace}/services(namespace=${namespace})}">Services</a></div>
     <div><a th:href="@{/namespaces/{namespace}/deployments(namespace=${namespace})}">Deployments</a></div>
     <div><a th:href="@{/namespaces/{namespace}/replicasets(namespace=${namespace})}">Replica Sets</a></div>
