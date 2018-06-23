@@ -1,16 +1,18 @@
 package org.vogel.kubernetes.dashboard;
 
-import io.kubernetes.client.models.V1LabelSelector;
-import io.kubernetes.client.models.V1LabelSelectorRequirement;
+import io.kubernetes.client.models.*;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 public class FormatUtils {
@@ -118,5 +120,30 @@ public class FormatUtils {
         }
 
         return result;
+    }
+
+    public static String formatEndpoints(V1Endpoints v1Endpoints, String name) {
+        List<V1EndpointSubset> subsets = v1Endpoints.getSubsets();
+        if (subsets.size() == 0) {
+            return "<none>";
+        }
+
+        List<String> list = new ArrayList<>();
+        for (V1EndpointSubset ss : subsets) {
+            List<V1EndpointPort> ports = ss.getPorts();
+            for (V1EndpointPort endpointPort : ports) {
+                if (StringUtils.isEmpty(name) || name.equals(endpointPort.getName())) {
+                    List<V1EndpointAddress> addresses = ss.getAddresses();
+                    for (V1EndpointAddress address : addresses) {
+                        String hostPort = String.format("%s:%s", address.getIp(), endpointPort.getPort()
+                                .toString());
+                        list.add(hostPort);
+                    }
+                }
+            }
+        }
+
+        return list.stream()
+                .collect(joining(","));
     }
 }
