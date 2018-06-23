@@ -264,4 +264,22 @@ public class KubernetesUtils {
                 .map(Service::new)
                 .collect(toList());
     }
+
+    public Service getService(String namespace, String serviceName) throws ApiException {
+        CoreV1Api api = new CoreV1Api();
+
+        V1Service kubeService = api.readNamespacedService(serviceName, namespace, null, null, null);
+        V1EndpointsList endpointsList = getEndpoint(namespace, serviceName);
+        V1Endpoints v1Endpoints = endpointsList.getItems()
+                .get(0);
+
+        return new Service(kubeService, v1Endpoints);
+    }
+
+    private V1EndpointsList getEndpoint(String namespace, String name) throws ApiException {
+        CoreV1Api api = new CoreV1Api();
+
+        String filter = String.format("metadata.name=%s", name);
+        return api.listNamespacedEndpoints(namespace, "false", null, filter, null, null, null, null, null, null);
+    }
 }

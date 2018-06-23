@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.validation.constraints.NotNull;
+
 @Slf4j
 @Controller
 @RequestMapping("/namespaces/{namespace}/services")
@@ -29,6 +31,23 @@ public class ServiceController {
             return "services";
         } catch (ApiException e) {
             log.error("Error getting list of services", e);
+            return "error";
+        }
+    }
+
+    @GetMapping("/{serviceName}")
+    public String describeService(Model model, @PathVariable("namespace") @NotNull String namespace,
+                                  @PathVariable @NotNull String serviceName) {
+        log.debug("In describePod with namespace: {} and pod: {}", namespace, serviceName);
+        try {
+            Service service = kubeUtils.getService(namespace, serviceName);
+            model.addAttribute("service", service);
+            model.addAttribute("serviceName", serviceName);
+            model.addAttribute("events", kubeUtils.getEvents(namespace, "Service", serviceName, service.getUid()));
+            model.addAttribute("namespace", namespace);
+            return "service_describe";
+        } catch (ApiException e) {
+            log.error("Error getting service", e);
             return "error";
         }
     }

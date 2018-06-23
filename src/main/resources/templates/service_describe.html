@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title th:text="'Kubernetes Service ' + ${serviceName}"></title>
+    <link rel="stylesheet" href="/webjars/bootstrap/4.1.0/css/bootstrap.css">
+    <script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+    <script src="/webjars/popper.js/1.14.1/umd/popper.js"></script>
+    <script src="/webjars/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/webjars/font-awesome/5.0.13/web-fonts-with-css/css/fontawesome-all.min.css">
+    <link href="/css/pods.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#">Kubernetes Dashboard</a>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#" th:href="@{/namespaces/{ns}(ns=${namespace})}">Home</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#" th:href="@{/namespaces/{ns}/services(ns=${namespace})}">Services</a>
+            </li>
+        </ul>
+        <span class="navbar-text" id="podName" th:text="'Kubernetes Service ' + ${serviceName}"></span>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <table class="table table-hover">
+            <tbody>
+            <tr>
+                <td>Name:</td>
+                <td th:text="${service.name}"></td>
+            </tr>
+            <tr>
+                <td>Namespace:</td>
+                <td th:text="${service.namespace}"></td>
+            </tr>
+            <tr>
+                <td>Labels:</td>
+                <td th:if="${service.labels} == null">&lt;none&gt;</td>
+                <td th:unless="${service.labels} == null">
+                    <ul class="multiline">
+                        <li th:each="label : ${service.labels}" th:text="${label}"></li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Annotations:</td>
+                <td th:if="${service.annotations} == null">&lt;none&gt;</td>
+                <td th:unless="${service.annotations} == null">
+                    <ul class="multiline">
+                        <li th:each="annotation : ${service.annotations}" th:text="${annotation}"></li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Selector:</td>
+                <td th:if="${#strings.isEmpty(service.selector)}">&lt;none&gt;</td>
+                <td th:unless="${#strings.isEmpty(service.selector)}" th:text="${service.selector}"></td>
+            </tr>
+            <tr>
+                <td>Type:</td>
+                <td th:text="${service.svcType}"></td>
+            </tr>
+            <tr>
+                <td>IP:</td>
+                <td th:text="${service.clusterIp}"></td>
+            </tr>
+            <tr th:if="${service.specExternalIp} != null">
+                <td>External IP:</td>
+                <td th:text="${service.specExternalIp}"></td>
+            </tr>
+            <tr th:unless="${#strings.isEmpty(service.loadBalancerIp)}">
+                <td>Load Balancer IP:</td>
+                <td th:text="${service.loadBalancerIp}"></td>
+            </tr>
+            <tr th:unless="${#strings.isEmpty(service.externalName)}">
+                <td>External Name:</td>
+                <td th:text="${service.externalName}"></td>
+            </tr>
+            <tr th:unless="${#strings.isEmpty(service.loadBalancerIngress)}">
+                <td>Load Balancer Ingress:</td>
+                <td th:text="${service.loadBalancerIngress}"></td>
+            </tr>
+            <th:block th:each="port : ${service.servicePorts}">
+                <tr>
+                    <td>Port:</td>
+                    <td th:text="${port.port}"></td>
+                </tr>
+                <tr>
+                    <td>Target Port:</td>
+                    <td th:text="${port.targetPort}"></td>
+                </tr>
+                <tr th:if="${port.nodePort} != null">
+                    <td>NodePort:</td>
+                    <td th:text="${port.nodePort}"></td>
+                </tr>
+                <tr>
+                    <td>Endpoints:</td>
+                    <td th:text="${port.endpoints}"></td>
+            </th:block>
+            <tr>
+                <td>Session Affinity:</td>
+                <td th:text="${service.sessionAffinity}"></td>
+            </tr>
+            <tr th:unless="${#strings.isEmpty(service.externalTrafficPolicy)}">
+                <td>External Traffic Policy:</td>
+                <td th:text="${service.externalTrafficPolicy}"></td>
+            </tr>
+            <tr th:if="${service.healthCheckNodePort} != 0">
+                <td>Health Check Node Port:</td>
+                <td th:text="${service.healthCheckNodePort}"></td>
+            </tr>
+            <tr th:unless="${#strings.isEmpty(service.loadBalancerSourceRanges)}">
+                <td>Load Balancer Source Ranges:</td>
+                <td th:text="${service.loadBalancerSourceRanges}"></td>
+            </tr>
+            <tr>
+                <td>Events:</td>
+                <td th:if="${#lists.isEmpty(events)}">&lt;none&gt;</td>
+                <td th:unless="${#lists.isEmpty(events)}">
+                    <table class="table table-hover">
+                        <tr>
+                            <td>Type</td>
+                            <td>Reason</td>
+                            <td>Age</td>
+                            <td>From</td>
+                            <td>Message</td>
+                        </tr>
+                        <tr th:each="event : ${events}">
+                            <td th:text="${event.type}"></td>
+                            <td th:text="${event.reason}"></td>
+                            <td th:text="${event.interval}"></td>
+                            <td th:text="${event.source}"></td>
+                            <td th:text="${event.message}"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
