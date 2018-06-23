@@ -38,7 +38,7 @@ public class ServiceController {
     @GetMapping("/{serviceName}")
     public String describeService(Model model, @PathVariable("namespace") @NotNull String namespace,
                                   @PathVariable @NotNull String serviceName) {
-        log.debug("In describePod with namespace: {} and pod: {}", namespace, serviceName);
+        log.debug("In describeService with namespace: {} and service: {}", namespace, serviceName);
         try {
             Service service = kubeUtils.getService(namespace, serviceName);
             model.addAttribute("service", service);

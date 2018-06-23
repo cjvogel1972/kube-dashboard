@@ -36,9 +36,9 @@ public class DeploymentController {
     }
 
     @GetMapping("/{deploymentName}")
-    public String describeReplicaSet(Model model, @PathVariable("namespace") @NotNull String namespace,
+    public String describeDeployment(Model model, @PathVariable("namespace") @NotNull String namespace,
                                      @PathVariable @NotNull String deploymentName) {
-        log.debug("In describeReplicaSet with namespace: {} and deployment: {}", namespace, deploymentName);
+        log.debug("In describeDeployment with namespace: {} and deployment: {}", namespace, deploymentName);
         try {
             Deployment deployment = kubeUtils.getDeployment(namespace, deploymentName);
             model.addAttribute("deployment", deployment);
