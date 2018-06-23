@@ -1,5 +1,6 @@
 package org.vogel.kubernetes.dashboard;
 
+import io.kubernetes.client.ApiException;
 import io.kubernetes.client.models.*;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -122,7 +123,38 @@ public class FormatUtils {
         return result;
     }
 
+    public static String describeBackend(String namespace, String serviceName, String servicePort,
+                                         KubernetesUtils kubernetesUtils) throws ApiException {
+        V1EndpointsList endpointsList = kubernetesUtils.getEndpoint(namespace, serviceName);
+        V1Endpoints v1Endpoints = null;
+        if (endpointsList.getItems()
+                .size() > 0) {
+            v1Endpoints = endpointsList.getItems()
+                    .get(0);
+        }
+        String spName = "";
+        try {
+            V1Service service = kubernetesUtils.getKubeService(namespace, serviceName);
+            List<V1ServicePort> ports = service.getSpec()
+                    .getPorts();
+            for (V1ServicePort port : ports) {
+                if (StringUtils.equalsAny(servicePort, port.getName(), port.getPort()
+                        .toString())) {
+                    spName = port.getName();
+                }
+            }
+        } catch (ApiException e) {
+//            e.printStackTrace();
+        }
+
+        return formatEndpoints(v1Endpoints, spName);
+    }
+
     public static String formatEndpoints(V1Endpoints v1Endpoints, String name) {
+        if (v1Endpoints == null) {
+            return "<none>";
+        }
+
         List<V1EndpointSubset> subsets = v1Endpoints.getSubsets();
         if (subsets.size() == 0) {
             return "<none>";

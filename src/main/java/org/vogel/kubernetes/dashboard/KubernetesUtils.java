@@ -267,9 +267,7 @@ public class KubernetesUtils {
     }
 
     public Service getService(String namespace, String serviceName) throws ApiException {
-        CoreV1Api api = new CoreV1Api();
-
-        V1Service kubeService = api.readNamespacedService(serviceName, namespace, null, null, null);
+        V1Service kubeService = getKubeService(namespace, serviceName);
         V1EndpointsList endpointsList = getEndpoint(namespace, serviceName);
         V1Endpoints v1Endpoints = endpointsList.getItems()
                 .get(0);
@@ -277,7 +275,7 @@ public class KubernetesUtils {
         return new Service(kubeService, v1Endpoints);
     }
 
-    private V1EndpointsList getEndpoint(String namespace, String name) throws ApiException {
+    public V1EndpointsList getEndpoint(String namespace, String name) throws ApiException {
         CoreV1Api api = new CoreV1Api();
 
         String filter = String.format("metadata.name=%s", name);
@@ -295,5 +293,19 @@ public class KubernetesUtils {
                 .stream()
                 .map(Ingress::new)
                 .collect(toList());
+    }
+
+    public Ingress getIngress(String namespace, String ingressName) throws ApiException {
+        ExtensionsV1beta1Api api = new ExtensionsV1beta1Api();
+
+        V1beta1Ingress kubeIngress = api.readNamespacedIngress(ingressName, namespace, null, null, null);
+
+        return new Ingress(kubeIngress, this);
+    }
+
+    public V1Service getKubeService(String namespace, String serviceName) throws ApiException {
+        CoreV1Api api = new CoreV1Api();
+
+        return api.readNamespacedService(serviceName, namespace, null, null, null);
     }
 }

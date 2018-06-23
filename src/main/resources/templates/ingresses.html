@@ -48,6 +48,7 @@
                 <th>Addresses</th>
                 <th>Ports</th>
                 <th>Age</th>
+                <th>Details</th>
             </tr>
             </thead>
             <tbody>
@@ -57,6 +58,9 @@
                 <td th:text="${ingress.addresses}"></td>
                 <td th:text="${ingress.ports}"></td>
                 <td th:text="${ingress.age}"></td>
+                <td><a href="#"
+                       th:href="@{/namespaces/{namespace}/ingresses/{ingressName}(namespace=${namespace},ingressName=${ingress.name})}"><span
+                        class="fas fa-info-circle"></span></a></td>
             </tr>
             </tbody>
         </table>
