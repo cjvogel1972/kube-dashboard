@@ -46,6 +46,7 @@ public class Ingress {
             describeIngressTLS(specTls);
         }
         annotations = printMultiline(metadata.getAnnotations());
+        uid = metadata.getUid();
     }
 
     public Ingress(V1beta1Ingress ingress, KubernetesUtils kubernetesUtils) throws ApiException {
