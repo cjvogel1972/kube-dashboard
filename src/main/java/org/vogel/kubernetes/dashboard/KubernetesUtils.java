@@ -308,4 +308,23 @@ public class KubernetesUtils {
 
         return api.readNamespacedService(serviceName, namespace, null, null, null);
     }
+
+    public List<ConfigMap> getConfigMaps(String namespace) throws ApiException {
+        CoreV1Api api = new CoreV1Api();
+
+        V1ConfigMapList configMapList = api.listNamespacedConfigMap(namespace, "false", null, null, null, null, null,
+                                                                    null,
+                                                                    null, null);
+
+        return configMapList.getItems()
+                .stream()
+                .map(ConfigMap::new)
+                .collect(toList());
+    }
+
+    public ConfigMap getConfigMap(String namespace, String configMapName) throws ApiException {
+        CoreV1Api api = new CoreV1Api();
+
+        return new ConfigMap(api.readNamespacedConfigMap(configMapName, namespace, null, null, null));
+    }
 }
