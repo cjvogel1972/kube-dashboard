@@ -99,6 +99,10 @@ public class Ingress {
     private String loadBalancerStatusStringer(V1LoadBalancerStatus loadBalancer) {
         List<V1LoadBalancerIngress> ingress = loadBalancer.getIngress();
 
+        if (ingress == null) {
+            return null;
+        }
+
         return ingress.stream()
                 .map(this::ingressToString)
                 .collect(joining(","));
