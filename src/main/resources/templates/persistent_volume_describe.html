@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title th:text="'Kubernetes Persistent Volume ' + ${persistentVolumeName}"></title>
+    <link rel="stylesheet" href="/webjars/bootstrap/4.1.0/css/bootstrap.css">
+    <script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+    <script src="/webjars/popper.js/1.14.1/umd/popper.js"></script>
+    <script src="/webjars/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/webjars/font-awesome/5.0.13/web-fonts-with-css/css/fontawesome-all.min.css">
+    <link href="/css/pods.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#">Kubernetes Dashboard</a>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#" th:href="@{/namespaces/{ns}(ns=${namespace})}">Home</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#" th:href="@{/namespaces/{ns}/persistentvolumes(ns=${namespace})}">Persistent
+                    Volumes</a>
+            </li>
+        </ul>
+        <span class="navbar-text" id="podName"
+              th:text="'Kubernetes Persistent Volume ' + ${persistentVolumeName}"></span>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <table class="table table-hover">
+            <tbody>
+            <tr>
+                <td>Name:</td>
+                <td th:text="${persistentVolume.name}"></td>
+            </tr>
+            <tr>
+                <td>Labels:</td>
+                <td th:if="${persistentVolume.labels} == null">&lt;none&gt;</td>
+                <td th:unless="${persistentVolume.labels} == null">
+                    <ul class="multiline">
+                        <li th:each="label : ${persistentVolume.labels}" th:text="${label}"></li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Annotations:</td>
+                <td th:if="${persistentVolume.annotations} == null">&lt;none&gt;</td>
+                <td th:unless="${persistentVolume.annotations} == null">
+                    <ul class="multiline">
+                        <li th:each="annotation : ${persistentVolume.annotations}" th:text="${annotation}"></li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Finalizers:</td>
+                <td th:text="${persistentVolume.finalizers}"></td>
+            </tr>
+            <tr>
+                <td>Storage Class:</td>
+                <td th:text="${persistentVolume.storageClass}"></td>
+            </tr>
+            <tr>
+                <td>Status:</td>
+                <td th:if="${persistentVolume.deletionTimestamp} == null"
+                    th:text="'Terminating (lasts ' + ${persistentVolume.deletionTimestamp} + ')'"></td>
+                <td th:unless="${persistentVolume.deletionTimestamp} == null" th:text="${persistentVolume.status}"></td>
+            </tr>
+            <tr>
+                <td>Claim:</td>
+                <td th:text="${persistentVolume.claim}"></td>
+            </tr>
+            <tr>
+                <td>Reclaim Policy:</td>
+                <td th:text="${persistentVolume.reclaimPolicy}"></td>
+            </tr>
+            <tr>
+                <td>Access Modes:</td>
+                <td th:text="${persistentVolume.accessModes}"></td>
+            </tr>
+            <tr>
+                <td>Capacity:</td>
+                <td th:text="${persistentVolume.capacity}"></td>
+            </tr>
+            <tr>
+                <td>Node Affinity:</td>
+                <td th:if="${persistentVolume.nodeAffinity} == null">&lt;none&gt;</td>
+                <td th:unless="${persistentVolume.nodeAffinity} == null"
+                    th:text="${persistentVolume.nodeAffinity}"></td>
+            </tr>
+            <tr>
+                <td>Message:</td>
+                <td th:text="${persistentVolume.message}"></td>
+            </tr>
+            <tr>
+                <td>Source:</td>
+                <td th:if="${persistentVolume.source } == null">&lt;unknown&gt;</td>
+                <td th:unless="${persistentVolume.source } == null">
+                    <table class="table table-hover">
+                        <tr th:each="source : ${persistentVolume.source}">
+                            <td th:text="${source.key}"></td>
+                            <td th:if="${source.value } == null">&lt;none&gt;></td>
+                            <td th:unless="${source.value } == null" th:text="${source.value}"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>Events:</td>
+                <td th:if="${#lists.isEmpty(events)}">&lt;none&gt;</td>
+                <td th:unless="${#lists.isEmpty(events)}">
+                    <table class="table table-hover">
+                        <tr>
+                            <td>Type</td>
+                            <td>Reason</td>
+                            <td>Age</td>
+                            <td>From</td>
+                            <td>Message</td>
+                        </tr>
+                        <tr th:each="event : ${events}">
+                            <td th:text="${event.type}"></td>
+                            <td th:text="${event.reason}"></td>
+                            <td th:text="${event.interval}"></td>
+                            <td th:text="${event.source}"></td>
+                            <td th:text="${event.message}"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -340,4 +340,10 @@ public class KubernetesUtils {
                 .map(PersistentVolume::new)
                 .collect(toList());
     }
+
+    public PersistentVolume getPersistentVolume(String persistentVolumeName) throws ApiException {
+        CoreV1Api api = new CoreV1Api();
+
+        return new PersistentVolume(api.readPersistentVolume(persistentVolumeName, null, null, null));
+    }
 }
