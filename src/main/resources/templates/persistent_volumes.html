@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Kubernetes Persistent Volumes</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/4.1.0/css/bootstrap.css">
+    <script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+    <script src="/webjars/popper.js/1.14.1/umd/popper.js"></script>
+    <script src="/webjars/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/webjars/font-awesome/5.0.13/web-fonts-with-css/css/fontawesome-all.min.css">
+    <link href="/css/pods.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#">Kubernetes Dashboard</a>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#" th:href="@{/namespaces/{ns}(ns=${namespace})}">Home</a>
+            </li>
+
+            <li class="nav-item dropdown" id="namespace">
+                <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarDropdown"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                   th:text="'Namespace: ' + ${namespace}"></a>
+
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="#"
+                       th:href="@{/namespaces/{namespace}/persistentvolumes(namespace=${ns})}"
+                       th:each="ns : ${namespaces}"
+                       th:text="${ns}"></a>
+                </div>
+            </li>
+        </ul>
+        <span class="navbar-text" id="podName" th:text="'Persistent Volumes for ' + ${namespace}"></span>
+
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Capacity</th>
+                <th>Access Modes</th>
+                <th>Reclaim Policy</th>
+                <th>Status</th>
+                <th>Claim</th>
+                <th>Storage Class</th>
+                <th>Reason</th>
+                <th>Age</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="persistentVolume : ${persistentVolumes}">
+                <td th:text="${persistentVolume.name}"></td>
+                <td th:text="${persistentVolume.capacity}"></td>
+                <td th:text="${persistentVolume.accessModes}"></td>
+                <td th:text="${persistentVolume.reclaimPolicy}"></td>
+                <td th:text="${persistentVolume.status}"></td>
+                <td th:text="${persistentVolume.claim}"></td>
+                <td th:text="${persistentVolume.storageClass}"></td>
+                <td th:text="${persistentVolume.reason}"></td>
+                <td th:text="${persistentVolume.age}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

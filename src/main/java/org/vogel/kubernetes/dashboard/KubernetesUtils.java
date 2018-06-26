@@ -327,4 +327,17 @@ public class KubernetesUtils {
 
         return new ConfigMap(api.readNamespacedConfigMap(configMapName, namespace, null, null, null));
     }
+
+    public List<PersistentVolume> getPersistentVolumes() throws ApiException {
+        CoreV1Api api = new CoreV1Api();
+
+        V1PersistentVolumeList persistentVolumeList = api.listPersistentVolume("false", null, null, null, null, null,
+                                                                               null, null,
+                                                                               null);
+
+        return persistentVolumeList.getItems()
+                .stream()
+                .map(PersistentVolume::new)
+                .collect(toList());
+    }
 }
