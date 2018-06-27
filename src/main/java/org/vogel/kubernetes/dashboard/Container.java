@@ -118,7 +118,7 @@ public class Container {
                     .stream()
                     .sorted()
                     .collect(toMap(key -> key, key -> resourcesLimits.get(key)
-                            .toString()));
+                            .toSuffixedString()));
         }
         Map<String, Quantity> resourcesRequests = resources.getRequests();
         if (resourcesRequests != null && resourcesRequests.size() > 0) {
@@ -127,7 +127,7 @@ public class Container {
                     .stream()
                     .sorted()
                     .collect(toMap(key -> key, key -> resourcesRequests.get(key)
-                            .toString()));
+                            .toSuffixedString()));
         }
     }
 
