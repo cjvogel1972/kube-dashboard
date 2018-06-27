@@ -5,9 +5,9 @@ import io.kubernetes.client.models.*;
 import lombok.Getter;
 import org.joda.time.DateTime;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
-import static java.util.stream.Collectors.joining;
 import static org.vogel.kubernetes.dashboard.FormatUtils.*;
 
 @Getter
@@ -78,23 +78,6 @@ public class PersistentVolume {
 
         return pv.getSpec()
                 .getStorageClassName();
-    }
-
-    private String getAccessModesAsString(List<String> accessModes) {
-        Set<String> modes = new HashSet<>(accessModes);
-        List<String> modesStr = new ArrayList<>();
-        if (modes.contains("ReadWriteOnce")) {
-            modesStr.add("RWO");
-        }
-        if (modes.contains("ReadOnlyMany")) {
-            modesStr.add("ROX");
-        }
-        if (modes.contains("ReadWriteMany")) {
-            modesStr.add("RWX");
-        }
-
-        return modesStr.stream()
-                .collect(joining(","));
     }
 
     private Map<String, String> determineSource(V1PersistentVolumeSpec pvSpec) {

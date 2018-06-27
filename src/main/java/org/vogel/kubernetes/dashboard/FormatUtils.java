@@ -566,4 +566,21 @@ public class FormatUtils {
 
         return info;
     }
+
+    public static String getAccessModesAsString(List<String> accessModes) {
+        Set<String> modes = new HashSet<>(accessModes);
+        List<String> modesStr = new ArrayList<>();
+        if (modes.contains("ReadWriteOnce")) {
+            modesStr.add("RWO");
+        }
+        if (modes.contains("ReadOnlyMany")) {
+            modesStr.add("ROX");
+        }
+        if (modes.contains("ReadWriteMany")) {
+            modesStr.add("RWX");
+        }
+
+        return modesStr.stream()
+                .collect(joining(","));
+    }
 }
