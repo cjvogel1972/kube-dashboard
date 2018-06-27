@@ -346,4 +346,27 @@ public class KubernetesUtils {
 
         return new PersistentVolume(api.readPersistentVolume(persistentVolumeName, null, null, null));
     }
+
+    public List<PersistentVolumeClaim> getPersistentVolumeClaims(String namespace) throws ApiException {
+        CoreV1Api api = new CoreV1Api();
+
+        V1PersistentVolumeClaimList persistentVolumeClaimList = api.listNamespacedPersistentVolumeClaim(namespace,
+                                                                                                        "false", null,
+                                                                                                        null,
+                                                                                                        null, null,
+                                                                                                        null, null,
+                                                                                                        null,
+                                                                                                        null);
+
+        return persistentVolumeClaimList.getItems()
+                .stream()
+                .map(PersistentVolumeClaim::new)
+                .collect(toList());
+    }
+
+    public PersistentVolumeClaim getPersistentVolumeClaim(String namespace, String persistentVolumeClaimName) throws ApiException {
+        CoreV1Api api = new CoreV1Api();
+
+        return new PersistentVolumeClaim(api.readNamespacedPersistentVolumeClaim(persistentVolumeClaimName, namespace, null, null, null));
+    }
 }

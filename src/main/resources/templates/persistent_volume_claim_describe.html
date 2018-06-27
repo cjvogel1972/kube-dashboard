@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title th:text="'Kubernetes Persistent Volume Claim' + ${persistentVolumeClaimName}"></title>
+    <link rel="stylesheet" href="/webjars/bootstrap/4.1.0/css/bootstrap.css">
+    <script src="/webjars/jquery/3.0.0/jquery.min.js"></script>
+    <script src="/webjars/popper.js/1.14.1/umd/popper.js"></script>
+    <script src="/webjars/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/webjars/font-awesome/5.0.13/web-fonts-with-css/css/fontawesome-all.min.css">
+    <link href="/css/pods.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#">Kubernetes Dashboard</a>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#" th:href="@{/namespaces/{ns}(ns=${namespace})}">Home</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#" th:href="@{/namespaces/{ns}/persistentvolumeclaims(ns=${namespace})}">Persistent
+                    Volume Claims</a>
+            </li>
+        </ul>
+        <span class="navbar-text" id="podName"
+              th:text="'Kubernetes Persistent Volume Claim ' + ${persistentVolumeClaimName}"></span>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <table class="table table-hover">
+            <tbody>
+            <tr>
+                <td>Name:</td>
+                <td th:text="${persistentVolumeClaim.name}"></td>
+            </tr>
+            <tr>
+                <td>Namespace:</td>
+                <td th:text="${persistentVolumeClaim.namespace}"></td>
+            </tr>
+            <tr>
+                <td>Storage Class:</td>
+                <td th:text="${persistentVolumeClaim.storageClass}"></td>
+            </tr>
+            <tr>
+                <td>Status:</td>
+                <td th:if="${persistentVolumeClaim.deletionTimestamp} == null"
+                    th:text="'Terminating (lasts ' + ${persistentVolumeClaim.deletionTimestamp} + ')'"></td>
+                <td th:unless="${persistentVolumeClaim.deletionTimestamp} == null"
+                    th:text="${persistentVolumeClaim.status}"></td>
+            </tr>
+            <tr>
+                <td>Volume:</td>
+                <td th:text="${persistentVolumeClaim.volume}"></td>
+            </tr>
+            <tr>
+                <td>Labels:</td>
+                <td th:if="${persistentVolumeClaim.labels} == null">&lt;none&gt;</td>
+                <td th:unless="${persistentVolumeClaim.labels} == null">
+                    <ul class="multiline">
+                        <li th:each="label : ${persistentVolumeClaim.labels}" th:text="${label}"></li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Annotations:</td>
+                <td th:if="${persistentVolumeClaim.annotations} == null">&lt;none&gt;</td>
+                <td th:unless="${persistentVolumeClaim.annotations} == null">
+                    <ul class="multiline">
+                        <li th:each="annotation : ${persistentVolumeClaim.annotations}" th:text="${annotation}"></li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Finalizers:</td>
+                <td th:text="${persistentVolumeClaim.finalizers}"></td>
+            </tr>
+            <tr>
+                <td>Capacity:</td>
+                <td th:text="${persistentVolumeClaim.capacity}"></td>
+            </tr>
+            <tr>
+                <td>Access Modes:</td>
+                <td th:text="${persistentVolumeClaim.accessModes}"></td>
+            </tr>
+            <tr th:if="${persistentVolumeClaim.volumeMode} != null">
+                <td>Volume Mode:</td>
+                <td th:text="${persistentVolumeClaim.volumeMode}"></td>
+            </tr>
+            <tr th:unless="${#lists.isEmpty(persistentVolumeClaim.conditions)}">
+                <td>Conditions:</td>
+                <td>
+                    <table class="table table-hover">
+                        <tr>
+                            <td>Type</td>
+                            <td>Status</td>
+                            <td>Last Probe Time</td>
+                            <td>Last Transition Time</td>
+                            <td>Reason</td>
+                            <td>Message</td>
+                        </tr>
+                        <tr th:each="condition : ${persistentVolumeClaim.conditions}">
+                            <td th:text="${condition.type}"></td>
+                            <td th:text="${condition.status}"></td>
+                            <td th:text="${#dates.format(condition.lastProbeTime.toDate(), 'EEE, dd MMM yyyy HH:mm:ss Z')}"></td>
+                            <td th:text="${#dates.format(condition.lastTransitionTime.toDate(), 'EEE, dd MMM yyyy HH:mm:ss Z')}"></td>
+                            <td th:text="${condition.reason}"></td>
+                            <td th:text="${condition.message}"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>Events:</td>
+                <td th:if="${#lists.isEmpty(events)}">&lt;none&gt;</td>
+                <td th:unless="${#lists.isEmpty(events)}">
+                    <table class="table table-hover">
+                        <tr>
+                            <td>Type</td>
+                            <td>Reason</td>
+                            <td>Age</td>
+                            <td>From</td>
+                            <td>Message</td>
+                        </tr>
+                        <tr th:each="event : ${events}">
+                            <td th:text="${event.type}"></td>
+                            <td th:text="${event.reason}"></td>
+                            <td th:text="${event.interval}"></td>
+                            <td th:text="${event.source}"></td>
+                            <td th:text="${event.message}"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
