@@ -88,10 +88,10 @@ public class KubernetesUtils {
     public ReplicaSet getReplicaSet(String namespace, String replicaSetName) throws ApiException {
         AppsV1beta2Api api = new AppsV1beta2Api();
 
-        V1beta2ReplicaSet kubeReplicatSet = api.readNamespacedReplicaSet(replicaSetName, namespace, null, null, null);
-        ReplicaSet replicaSet = new ReplicaSet(kubeReplicatSet);
+        V1beta2ReplicaSet kubeReplicaSet = api.readNamespacedReplicaSet(replicaSetName, namespace, null, null, null);
+        ReplicaSet replicaSet = new ReplicaSet(kubeReplicaSet);
         PodStatus podStatus = getPodStatusForController(namespace, replicaSet.getSelector(),
-                                                        kubeReplicatSet.getMetadata()
+                                                        kubeReplicaSet.getMetadata()
                                                                 .getUid());
         replicaSet.setStatus(podStatus);
         return replicaSet;
@@ -102,32 +102,8 @@ public class KubernetesUtils {
 
         V1PodList podList = api.listNamespacedPod(namespace, "false", null, null, null, selector, null, null, null,
                                                   null);
-        int running = 0;
-        int waiting = 0;
-        int succeeded = 0;
-        int failed = 0;
-        List<V1Pod> pods = podList.getItems();
-        for (V1Pod pod : pods) {
-            if (!isControlledBy(pod.getMetadata(), uid)) {
-                continue;
-            }
-            String phase = pod.getStatus()
-                    .getPhase();
-            if ("Running".equals(phase)) {
-                running++;
-            }
-            if ("Pending".equals(phase)) {
-                waiting++;
-            }
-            if ("Succeeded".equals(phase)) {
-                succeeded++;
-            }
-            if ("Failed".equals(phase)) {
-                failed++;
-            }
-        }
 
-        return new PodStatus(running, waiting, succeeded, failed);
+        return new PodStatus(podList.getItems(), uid, this);
     }
 
     public List<Deployment> getDeployments(String namespace) throws ApiException {
@@ -171,7 +147,7 @@ public class KubernetesUtils {
                 .collect(toList());
     }
 
-    private boolean isControlledBy(V1ObjectMeta metadata, String uid) {
+    public boolean isControlledBy(V1ObjectMeta metadata, String uid) {
         Optional<V1OwnerReference> ownerReference = getControllerOf(metadata);
         return ownerReference.map(v1OwnerReference -> v1OwnerReference
                 .getUid()
