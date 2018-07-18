@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -29,13 +30,10 @@ public class KubernetesUtils {
 
     public List<String> getNamespaces() throws ApiException {
         CoreV1Api api = new CoreV1Api();
-        V1NamespaceList namespaces = api.listNamespace(null, null, null, null, null, null, null, null, null);
+        V1NamespaceList namespaceList = api.listNamespace(null, null, null, null, null, null, null, null, null);
 
-        return namespaces.getItems()
-                .stream()
-                .map(ns -> ns.getMetadata()
-                        .getName())
-                .collect(toList());
+        return createListObjects(namespaceList.getItems(), ns -> ns.getMetadata()
+                .getName());
     }
 
     public List<Event> getEvents(String namespace, String kind, String replicaSetName, String uid) throws ApiException {
@@ -45,20 +43,14 @@ public class KubernetesUtils {
         V1EventList eventList = api.listNamespacedEvent(namespace, "false", null, filter, null, null, null, null, null,
                                                         null);
 
-        return eventList.getItems()
-                .stream()
-                .map(Event::new)
-                .collect(toList());
+        return createListObjects(eventList.getItems(), Event::new);
     }
 
     public List<Pod> getPods(String namespace) throws ApiException {
         CoreV1Api api = new CoreV1Api();
-        V1PodList list = api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null);
+        V1PodList podList = api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null);
 
-        return list.getItems()
-                .stream()
-                .map(Pod::new)
-                .collect(toList());
+        return createListObjects(podList.getItems(), Pod::new);
     }
 
     public Pod getPod(String namespace, String podName) throws ApiException {
@@ -76,13 +68,11 @@ public class KubernetesUtils {
     public List<ReplicaSet> getReplicaSets(String namespace) throws ApiException {
         AppsV1beta2Api api = new AppsV1beta2Api();
 
-        V1beta2ReplicaSetList list = api.listNamespacedReplicaSet(namespace, "false", null, null, null, null, null,
-                                                                  null, null, null);
+        V1beta2ReplicaSetList replicaSetList = api.listNamespacedReplicaSet(namespace, "false", null, null, null, null,
+                                                                            null,
+                                                                            null, null, null);
 
-        return list.getItems()
-                .stream()
-                .map(ReplicaSet::new)
-                .collect(toList());
+        return createListObjects(replicaSetList.getItems(), ReplicaSet::new);
     }
 
     public ReplicaSet getReplicaSet(String namespace, String replicaSetName) throws ApiException {
@@ -112,10 +102,7 @@ public class KubernetesUtils {
         V1beta2DeploymentList deploymentList = api.listNamespacedDeployment(namespace, "false", null, null, null, null,
                                                                             null, null, null, null);
 
-        return deploymentList.getItems()
-                .stream()
-                .map(Deployment::new)
-                .collect(toList());
+        return createListObjects(deploymentList.getItems(), Deployment::new);
     }
 
     public Deployment getDeployment(String namespace, String deploymentName) throws ApiException {
@@ -236,10 +223,7 @@ public class KubernetesUtils {
         V1ServiceList serviceList = api.listNamespacedService(namespace, "false", null, null, null, null, null, null,
                                                               null, null);
 
-        return serviceList.getItems()
-                .stream()
-                .map(Service::new)
-                .collect(toList());
+        return createListObjects(serviceList.getItems(), Service::new);
     }
 
     public Service getService(String namespace, String serviceName) throws ApiException {
@@ -265,10 +249,7 @@ public class KubernetesUtils {
                                                                    null,
                                                                    null, null);
 
-        return ingressList.getItems()
-                .stream()
-                .map(Ingress::new)
-                .collect(toList());
+        return createListObjects(ingressList.getItems(), Ingress::new);
     }
 
     public Ingress getIngress(String namespace, String ingressName) throws ApiException {
@@ -292,10 +273,7 @@ public class KubernetesUtils {
                                                                     null,
                                                                     null, null);
 
-        return configMapList.getItems()
-                .stream()
-                .map(ConfigMap::new)
-                .collect(toList());
+        return createListObjects(configMapList.getItems(), ConfigMap::new);
     }
 
     public ConfigMap getConfigMap(String namespace, String configMapName) throws ApiException {
@@ -311,10 +289,7 @@ public class KubernetesUtils {
                                                                                null, null,
                                                                                null);
 
-        return persistentVolumeList.getItems()
-                .stream()
-                .map(PersistentVolume::new)
-                .collect(toList());
+        return createListObjects(persistentVolumeList.getItems(), PersistentVolume::new);
     }
 
     public PersistentVolume getPersistentVolume(String persistentVolumeName) throws ApiException {
@@ -333,16 +308,20 @@ public class KubernetesUtils {
                                                                                                         null, null,
                                                                                                         null,
                                                                                                         null);
-
-        return persistentVolumeClaimList.getItems()
-                .stream()
-                .map(PersistentVolumeClaim::new)
-                .collect(toList());
+        return createListObjects(persistentVolumeClaimList.getItems(), PersistentVolumeClaim::new);
     }
 
-    public PersistentVolumeClaim getPersistentVolumeClaim(String namespace, String persistentVolumeClaimName) throws ApiException {
+    public PersistentVolumeClaim getPersistentVolumeClaim(String namespace,
+                                                          String persistentVolumeClaimName) throws ApiException {
         CoreV1Api api = new CoreV1Api();
 
-        return new PersistentVolumeClaim(api.readNamespacedPersistentVolumeClaim(persistentVolumeClaimName, namespace, null, null, null));
+        return new PersistentVolumeClaim(
+                api.readNamespacedPersistentVolumeClaim(persistentVolumeClaimName, namespace, null, null, null));
+    }
+
+    private <T, R> List<R> createListObjects(List<T> items, Function<T, R> creator) {
+        return items.stream()
+                .map(creator)
+                .collect(toList());
     }
 }
