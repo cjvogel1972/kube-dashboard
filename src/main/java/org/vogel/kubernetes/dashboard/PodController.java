@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Controller
@@ -60,10 +61,11 @@ public class PodController {
                               @PathVariable @NotNull String podName) {
         log.debug("In showPodLogs with namespace: {} and pod: {}", namespace, podName);
         try {
-            List<String> logs = Arrays.stream(kubeUtils.getPodLogs(namespace, podName)
-                                                      .split("\n"))
+            String[] splitLogs = kubeUtils.getPodLogs(namespace, podName)
+                    .split("\n");
+            List<String> logs = Arrays.stream(splitLogs)
                     .map(line -> line.replace("\t", "        "))
-                    .collect(Collectors.toList());
+                    .collect(toList());
             model.addAttribute("logs", logs);
             model.addAttribute("podName", podName);
             model.addAttribute("namespace", namespace);

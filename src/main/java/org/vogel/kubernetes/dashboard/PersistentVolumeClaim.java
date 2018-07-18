@@ -11,8 +11,8 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static org.vogel.kubernetes.dashboard.FormatUtils.*;
 
 @Getter
@@ -72,7 +72,7 @@ public class PersistentVolumeClaim {
             conditions = pvcStatus.getConditions()
                     .stream()
                     .map(PersistentVolumeClaimCondition::new)
-                    .collect(Collectors.toList());
+                    .collect(toList());
         }
         uid = metadata.getUid();
     }

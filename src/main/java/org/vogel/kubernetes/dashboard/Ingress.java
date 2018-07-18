@@ -9,9 +9,9 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static org.vogel.kubernetes.dashboard.FormatUtils.*;
 
 @Getter
@@ -87,7 +87,7 @@ public class Ingress {
         List<String> list = rules.stream()
                 .filter(rule -> StringUtils.isNotEmpty(rule.getHost()))
                 .map(V1beta1IngressRule::getHost)
-                .collect(Collectors.toList());
+                .collect(toList());
 
         if (list.size() == 0) {
             return "*";
