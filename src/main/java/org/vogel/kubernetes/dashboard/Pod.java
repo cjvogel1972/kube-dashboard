@@ -198,7 +198,11 @@ public class Pod {
         }
 
         nodeSelectors = printMultiline(podSpec.getNodeSelector());
-        List<V1Toleration> podSpecTolerations = podSpec.getTolerations();
+        printPodTolerations(podSpec.getTolerations());
+        uid = metadata.getUid();
+    }
+
+    private void printPodTolerations(List<V1Toleration> podSpecTolerations) {
         if (podSpecTolerations != null && podSpecTolerations.size() > 0) {
             tolerations = new ArrayList<>();
             for (V1Toleration podToleration : podSpecTolerations) {
@@ -220,6 +224,5 @@ public class Pod {
                 tolerations.add(tol.toString());
             }
         }
-        uid = metadata.getUid();
     }
 }
