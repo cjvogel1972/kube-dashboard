@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.vogel.kubernetes.dashboard.FormatUtils.describeBackend;
+import static org.vogel.kubernetes.dashboard.FormatUtils.joinListWithCommas;
 
 @Getter
 public class Ingress extends Metadata {
@@ -80,8 +81,7 @@ public class Ingress extends Metadata {
         if (list.size() == 0) {
             return "*";
         } else {
-            return list.stream()
-                    .collect(joining(","));
+            return joinListWithCommas(list);
         }
     }
 
@@ -118,9 +118,7 @@ public class Ingress extends Metadata {
     private void describeIngressTLS(List<V1beta1IngressTLS> specTls) {
         tls = new ArrayList<>();
         for (V1beta1IngressTLS t : specTls) {
-            String tlsHosts = t.getHosts()
-                    .stream()
-                    .collect(joining(","));
+            String tlsHosts = joinListWithCommas(t.getHosts());
             if (isEmpty(t.getSecretName())) {
                 tls.add(String.format("SNI routes %s", tlsHosts));
             } else {

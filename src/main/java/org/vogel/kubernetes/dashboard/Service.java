@@ -2,13 +2,14 @@ package org.vogel.kubernetes.dashboard;
 
 import io.kubernetes.client.models.*;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.*;
+import static org.vogel.kubernetes.dashboard.FormatUtils.joinListWithCommas;
 
 @Getter
 public class Service extends Metadata {
@@ -33,7 +34,7 @@ public class Service extends Metadata {
         V1ServiceStatus serviceStatus = service.getStatus();
         svcType = serviceSpec.getType();
         clusterIp = serviceSpec.getClusterIP();
-        if (StringUtils.isBlank(clusterIp)) {
+        if (isBlank(clusterIp)) {
             clusterIp = "<none>";
         }
         externalIp = getServiceExternalIP(service);
@@ -49,9 +50,7 @@ public class Service extends Metadata {
         }
         if (serviceSpec.getExternalIPs() != null && serviceSpec.getExternalIPs()
                 .size() > 0) {
-            specExternalIp = serviceSpec.getExternalIPs()
-                    .stream()
-                    .collect(joining(","));
+            specExternalIp = joinListWithCommas(serviceSpec.getExternalIPs());
         }
         loadBalancerIp = serviceSpec.getLoadBalancerIP();
         externalName = serviceSpec.getExternalName();
@@ -67,9 +66,7 @@ public class Service extends Metadata {
         }
         if (serviceSpec.getLoadBalancerSourceRanges() != null && serviceSpec.getLoadBalancerSourceRanges()
                 .size() > 0) {
-            loadBalancerSourceRanges = serviceSpec.getLoadBalancerSourceRanges()
-                    .stream()
-                    .collect(joining(","));
+            loadBalancerSourceRanges = joinListWithCommas(serviceSpec.getLoadBalancerSourceRanges());
         }
     }
 
@@ -84,11 +81,10 @@ public class Service extends Metadata {
 
     private String getServiceExternalIP(V1Service service) {
         V1ServiceSpec spec = service.getSpec();
-        if (StringUtils.equalsAny(svcType, "ClusterIP", "NodePort")) {
+        if (equalsAny(svcType, "ClusterIP", "NodePort")) {
             List<String> externalIPs = spec.getExternalIPs();
             if (externalIPs != null && externalIPs.size() > 0) {
-                return externalIPs.stream()
-                        .collect(joining(","));
+                return joinListWithCommas(externalIPs);
             }
             return "<none>";
         } else if (svcType.equals("LoadBalancer")) {
@@ -99,11 +95,10 @@ public class Service extends Metadata {
                 List<String> results = new ArrayList<>();
                 results.add(lbIps);
                 results.addAll(externalIPs);
-                return results.stream()
-                        .collect(joining(","));
+                return joinListWithCommas(results);
             }
 
-            if (StringUtils.isNotBlank(lbIps)) {
+            if (isNotBlank(lbIps)) {
                 return lbIps;
             }
 
@@ -124,9 +119,9 @@ public class Service extends Metadata {
     }
 
     private String ingressToString(V1LoadBalancerIngress ing) {
-        if (StringUtils.isNotBlank(ing.getIp())) {
+        if (isNotBlank(ing.getIp())) {
             return ing.getIp();
-        } else if (StringUtils.isNotBlank(ing.getHostname())) {
+        } else if (isNotBlank(ing.getHostname())) {
             return ing.getHostname();
         }
 

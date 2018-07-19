@@ -173,8 +173,7 @@ public class FormatUtils {
             }
         }
 
-        return list.stream()
-                .collect(joining(","));
+        return joinListWithCommas(list);
     }
 
     public static Map<String, String> printHostPathVolumeSource(V1HostPathVolumeSource hostPath) {
@@ -270,9 +269,7 @@ public class FormatUtils {
         info.put("ISCSIInterface:", iscsi.getIscsiInterface());
         info.put("FSType:", iscsi.getFsType());
         info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(iscsi.isReadOnly())));
-        String portals = iscsi.getPortals()
-                .stream()
-                .collect(joining(","));
+        String portals = joinListWithCommas(iscsi.getPortals());
         info.put("Portals:", portals);
         info.put("DiscoveryCHAPAuth:", Boolean.toString(Boolean.TRUE.equals(iscsi.isChapAuthDiscovery())));
         info.put("SessionCHAPAuth:", Boolean.toString(Boolean.TRUE.equals(iscsi.isChapAuthSession())));
@@ -306,9 +303,7 @@ public class FormatUtils {
     public static Map<String, String> printRBDVolumeSource(V1RBDVolumeSource rbd) {
         Map<String, String> info = new LinkedHashMap<>();
         info.put("Type:", "RBD (a Rados Block Device mount on the host that shares a pod's lifetime)");
-        String monitors = rbd.getMonitors()
-                .stream()
-                .collect(joining(","));
+        String monitors = joinListWithCommas(rbd.getMonitors());
         info.put("CephMonitors:", monitors);
         info.put("RBDImage:", rbd.getImage());
         info.put("FSType:", rbd.getFsType());
@@ -444,9 +439,7 @@ public class FormatUtils {
     public static Map<String, String> printCephFSVolumeSource(V1CephFSVolumeSource cephfs) {
         Map<String, String> info = new LinkedHashMap<>();
         info.put("Type:", "CephFS (a CephFS mount on the host that shares a pod's lifetime)");
-        String monitors = cephfs.getMonitors()
-                .stream()
-                .collect(joining(","));
+        String monitors = joinListWithCommas(cephfs.getMonitors());
         info.put("Monitors:", monitors);
         info.put("Path:", cephfs.getPath());
         info.put("User:", cephfs.getUser());
@@ -461,9 +454,7 @@ public class FormatUtils {
     public static Map<String, String> printCephFSPersistentVolumeSource(V1CephFSPersistentVolumeSource cephfs) {
         Map<String, String> info = new LinkedHashMap<>();
         info.put("Type:", "CephFS (a CephFS mount on the host that shares a pod's lifetime)");
-        String monitors = cephfs.getMonitors()
-                .stream()
-                .collect(joining(","));
+        String monitors = joinListWithCommas(cephfs.getMonitors());
         info.put("Monitors:", monitors);
         info.put("Path:", cephfs.getPath());
         info.put("User:", cephfs.getUser());
@@ -501,9 +492,7 @@ public class FormatUtils {
     public static Map<String, String> printFCVolumeSource(V1FCVolumeSource fc) {
         Map<String, String> info = new LinkedHashMap<>();
         info.put("Type:", "FC (a Fibre Channel disk)");
-        String targetWwns = fc.getTargetWWNs()
-                .stream()
-                .collect(joining(","));
+        String targetWwns = joinListWithCommas(fc.getTargetWWNs());
         info.put("TargetWWNs:", targetWwns);
         String lun = null;
         if (fc.getLun() != null) {
@@ -580,7 +569,11 @@ public class FormatUtils {
             modesStr.add("RWX");
         }
 
-        return modesStr.stream()
+        return joinListWithCommas(modesStr);
+    }
+
+    public static String joinListWithCommas(List<String> list) {
+        return list.stream()
                 .collect(joining(","));
     }
 }

@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.equalsAny;
+import static org.vogel.kubernetes.dashboard.FormatUtils.joinListWithCommas;
 
 @Getter
 public class Requirement {
@@ -60,8 +61,7 @@ public class Requirement {
             builder.append("(");
         }
 
-        String joinedValues = values.stream()
-                .collect(joining(","));
+        String joinedValues = joinListWithCommas(values);
         builder.append(joinedValues);
 
         if (equalsAny(operation, "exists", "!")) {

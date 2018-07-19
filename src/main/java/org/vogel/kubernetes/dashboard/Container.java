@@ -10,6 +10,7 @@ import java.util.*;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.vogel.kubernetes.dashboard.FormatUtils.joinListWithCommas;
 
 @Getter
 public class Container {
@@ -146,10 +147,8 @@ public class Container {
                                      probe.getPeriodSeconds(), probe.getSuccessThreshold(),
                                      probe.getFailureThreshold());
         if (probe.getExec() != null) {
-            String command = probe.getExec()
-                    .getCommand()
-                    .stream()
-                    .collect(joining(" "));
+            String command = joinListWithCommas(probe.getExec()
+                                                        .getCommand());
             return String.format("exec %s %s", command, attrs);
         } else if (probe.getHttpGet() != null) {
             String url;
@@ -306,8 +305,7 @@ public class Container {
                 if (isNotBlank(mount.getSubPath())) {
                     flagsList.add(String.format("path=%s", mount.getSubPath()));
                 }
-                String flags = flagsList.stream()
-                        .collect(joining(","));
+                String flags = joinListWithCommas(flagsList);
                 mounts.add(String.format("%s from %s (%s)", mount.getMountPath(), mount.getName(), flags));
             }
         }

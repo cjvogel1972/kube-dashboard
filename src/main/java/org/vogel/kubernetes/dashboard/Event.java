@@ -7,8 +7,8 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.vogel.kubernetes.dashboard.FormatUtils.joinListWithCommas;
 import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
 
 @Getter
@@ -39,7 +39,6 @@ public class Event {
             eventSourceString.add(source.getHost());
         }
 
-        return eventSourceString.stream()
-                .collect(joining(","));
+        return joinListWithCommas(eventSourceString);
     }
 }

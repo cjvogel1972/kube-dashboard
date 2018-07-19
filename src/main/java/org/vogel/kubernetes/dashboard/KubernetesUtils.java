@@ -246,8 +246,7 @@ public class KubernetesUtils {
         ExtensionsV1beta1Api api = new ExtensionsV1beta1Api();
 
         V1beta1IngressList ingressList = api.listNamespacedIngress(namespace, "false", null, null, null, null, null,
-                                                                   null,
-                                                                   null, null);
+                                                                   null, null, null);
 
         return createListObjects(ingressList.getItems(), Ingress::new);
     }
