@@ -4,7 +4,9 @@ import io.kubernetes.client.custom.IntOrString;
 import io.kubernetes.client.models.V1Endpoints;
 import io.kubernetes.client.models.V1ServicePort;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
+
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static org.vogel.kubernetes.dashboard.FormatUtils.formatEndpoints;
 
 @Getter
 public class ServicePort {
@@ -14,10 +16,7 @@ public class ServicePort {
     private String endpoints;
 
     public ServicePort(V1ServicePort servicePort, V1Endpoints v1Endpoints) {
-        String name = servicePort.getName();
-        if (StringUtils.isEmpty(name)) {
-            name = "<unset>";
-        }
+        String name = defaultIfBlank(servicePort.getName(), "<unset>");
         String protocol = servicePort.getProtocol();
         port = String.format("%s %d/%s", name, servicePort.getPort(), protocol);
         IntOrString targetPort = servicePort.getTargetPort();
@@ -29,6 +28,6 @@ public class ServicePort {
         if (servicePort.getNodePort() != null && servicePort.getNodePort() != 0) {
             nodePort = String.format("%s %d/%s", name, servicePort.getNodePort(), protocol);
         }
-        endpoints = FormatUtils.formatEndpoints(v1Endpoints, servicePort.getName());
+        endpoints = formatEndpoints(v1Endpoints, servicePort.getName());
     }
 }

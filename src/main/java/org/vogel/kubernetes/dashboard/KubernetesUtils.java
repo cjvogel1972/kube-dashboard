@@ -69,8 +69,7 @@ public class KubernetesUtils {
         AppsV1beta2Api api = new AppsV1beta2Api();
 
         V1beta2ReplicaSetList replicaSetList = api.listNamespacedReplicaSet(namespace, "false", null, null, null, null,
-                                                                            null,
-                                                                            null, null, null);
+                                                                            null, null, null, null);
 
         return createListObjects(replicaSetList.getItems(), ReplicaSet::new);
     }

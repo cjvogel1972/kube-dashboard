@@ -2,7 +2,6 @@ package org.vogel.kubernetes.dashboard;
 
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.models.*;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
@@ -12,7 +11,7 @@ import java.util.*;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 public class FormatUtils {
     public static String translateTimestamp(DateTime timestamp) {
@@ -136,7 +135,7 @@ public class FormatUtils {
             List<V1ServicePort> ports = service.getSpec()
                     .getPorts();
             for (V1ServicePort port : ports) {
-                if (StringUtils.equalsAny(servicePort, port.getName(), port.getPort()
+                if (equalsAny(servicePort, port.getName(), port.getPort()
                         .toString())) {
                     spName = port.getName();
                 }
@@ -162,7 +161,7 @@ public class FormatUtils {
         for (V1EndpointSubset ss : subsets) {
             List<V1EndpointPort> ports = ss.getPorts();
             for (V1EndpointPort endpointPort : ports) {
-                if (StringUtils.isEmpty(name) || name.equals(endpointPort.getName())) {
+                if (isEmpty(name) || name.equals(endpointPort.getName())) {
                     List<V1EndpointAddress> addresses = ss.getAddresses();
                     for (V1EndpointAddress address : addresses) {
                         String hostPort = String.format("%s:%s", address.getIp(), endpointPort.getPort()
@@ -180,10 +179,7 @@ public class FormatUtils {
         Map<String, String> info = new LinkedHashMap<>();
         info.put("Type:", "HostPath (bare host directory volume)");
         info.put("Path", hostPath.getPath());
-        String type = hostPath.getType();
-        if (isBlank(type)) {
-            type = "none";
-        }
+        String type = defaultIfBlank(hostPath.getType(), "none");
         info.put("HostPathType:", type);
 
         return info;

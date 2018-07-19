@@ -33,10 +33,7 @@ public class Service extends Metadata {
         V1ServiceSpec serviceSpec = service.getSpec();
         V1ServiceStatus serviceStatus = service.getStatus();
         svcType = serviceSpec.getType();
-        clusterIp = serviceSpec.getClusterIP();
-        if (isBlank(clusterIp)) {
-            clusterIp = "<none>";
-        }
+        clusterIp = defaultIfBlank(serviceSpec.getClusterIP(), "<none>");
         externalIp = getServiceExternalIP(service);
         ports = makePortString(serviceSpec.getPorts());
 

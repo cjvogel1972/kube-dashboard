@@ -6,12 +6,12 @@ import io.kubernetes.client.models.V1PersistentVolumeClaim;
 import io.kubernetes.client.models.V1PersistentVolumeClaimSpec;
 import io.kubernetes.client.models.V1PersistentVolumeClaimStatus;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.vogel.kubernetes.dashboard.FormatUtils.getAccessModesAsString;
 import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
 
@@ -41,7 +41,7 @@ public class PersistentVolumeClaim extends Metadata {
         volume = pvcSpec.getVolumeName();
         capacity = "";
         accessModes = "";
-        if (StringUtils.isNotEmpty(volume)) {
+        if (isNotEmpty(volume)) {
             accessModes = getAccessModesAsString(pvcSpec.getAccessModes());
             Quantity storage = pvcStatus.getCapacity()
                     .get("storage");
@@ -72,8 +72,8 @@ public class PersistentVolumeClaim extends Metadata {
             return annotations.get("volume.beta.kubernetes.io/storage-class");
         }
 
-        if (StringUtils.isNotEmpty(pvc.getSpec()
-                                           .getStorageClassName())) {
+        if (isNotEmpty(pvc.getSpec()
+                               .getStorageClassName())) {
             return pvc.getSpec()
                     .getStorageClassName();
         }

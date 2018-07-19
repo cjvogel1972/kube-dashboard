@@ -5,11 +5,11 @@ import io.kubernetes.client.custom.IntOrString;
 import io.kubernetes.client.models.V1beta1HTTPIngressPath;
 import io.kubernetes.client.models.V1beta1IngressRule;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.vogel.kubernetes.dashboard.FormatUtils.describeBackend;
 
 @Getter
@@ -20,11 +20,7 @@ public class IngressRule {
 
     public IngressRule(V1beta1IngressRule rule, String ns,
                        KubernetesUtils kubernetesUtils) throws ApiException {
-        host = rule.getHost();
-        if (StringUtils.isEmpty(host)) {
-            host = "*";
-        }
-
+        host = defaultIfBlank(rule.getHost(), "*");
         paths = new ArrayList<>();
         backends = new ArrayList<>();
         List<V1beta1HTTPIngressPath> ingressPaths = rule.getHttp()

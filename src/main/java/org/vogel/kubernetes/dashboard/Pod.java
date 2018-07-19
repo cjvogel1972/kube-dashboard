@@ -8,6 +8,7 @@ import org.thymeleaf.util.StringUtils;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.vogel.kubernetes.dashboard.FormatUtils.printMultiline;
 import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
@@ -127,10 +128,15 @@ public class Pod extends Metadata {
 
         V1ObjectMeta metadata = pod.getMetadata();
         deletionTimestamp = metadata.getDeletionTimestamp();
-        if (deletionTimestamp != null && StringUtils.equals("NodeLost", describeReason)) {
-            reason = "Unknown";
-        } else if (deletionTimestamp != null) {
-            reason = "Terminating";
+        if (deletionTimestamp != null) {
+            deletionDuration = translateTimestamp(deletionTimestamp);
+            deletionGracePeriodSeconds = metadata.getDeletionGracePeriodSeconds();
+
+            if (StringUtils.equals("NodeLost", describeReason)) {
+                reason = "Unknown";
+            } else {
+                reason = "Terminating";
+            }
         }
 
         ready = String.format("%d/%d", readyContainers, totalContainers);
@@ -143,10 +149,6 @@ public class Pod extends Metadata {
         hostIp = podStatus.getHostIP();
         startTime = podStatus.getStartTime();
 
-        if (deletionTimestamp != null) {
-            deletionDuration = translateTimestamp(deletionTimestamp);
-            deletionGracePeriodSeconds = metadata.getDeletionGracePeriodSeconds();
-        }
         status = podStatus.getPhase();
         message = podStatus.getMessage();
         podIp = podStatus.getPodIP();
@@ -172,12 +174,10 @@ public class Pod extends Metadata {
                 .map(container -> new Container(container, containerStatuses))
                 .collect(toList());
 
-        if (podStatus.getConditions() != null && podStatus.getConditions()
-                .size() > 0) {
-            conditions = new LinkedHashMap<>();
-            for (V1PodCondition c : podStatus.getConditions()) {
-                conditions.put(c.getType(), c.getStatus());
-            }
+        List<V1PodCondition> podConditions = podStatus.getConditions();
+        if (podConditions != null) {
+            conditions = podConditions.stream()
+                    .collect(toMap(V1PodCondition::getType, V1PodCondition::getStatus, null, LinkedHashMap::new));
         }
 
         volumes = new Volumes(podSpec.getVolumes());

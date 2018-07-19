@@ -4,11 +4,11 @@ import io.kubernetes.client.models.V1Container;
 import io.kubernetes.client.models.V1ObjectMeta;
 import io.kubernetes.client.models.V1PodTemplateSpec;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.vogel.kubernetes.dashboard.FormatUtils.printMultiline;
 
 @Getter
@@ -29,8 +29,8 @@ public class PodTemplate {
             annotations = printMultiline(metadata.getAnnotations());
         }
 
-        if (StringUtils.isNotEmpty(template.getSpec()
-                                           .getServiceAccountName())) {
+        if (isNotEmpty(template.getSpec()
+                               .getServiceAccountName())) {
             serviceAccountName = template.getSpec()
                     .getServiceAccountName();
         }
