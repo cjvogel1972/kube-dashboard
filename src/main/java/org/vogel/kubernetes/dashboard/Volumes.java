@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.vogel.kubernetes.dashboard.FormatUtils.*;
+import static org.vogel.kubernetes.dashboard.VolumeFormatUtils.*;
 
 @Getter
 public class Volumes {

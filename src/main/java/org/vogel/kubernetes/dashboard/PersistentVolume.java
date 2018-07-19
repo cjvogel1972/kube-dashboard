@@ -6,7 +6,9 @@ import lombok.Getter;
 
 import java.util.Map;
 
-import static org.vogel.kubernetes.dashboard.FormatUtils.*;
+import static org.vogel.kubernetes.dashboard.FormatUtils.getAccessModesAsString;
+import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
+import static org.vogel.kubernetes.dashboard.VolumeFormatUtils.*;
 
 @Getter
 public class PersistentVolume extends Metadata {
