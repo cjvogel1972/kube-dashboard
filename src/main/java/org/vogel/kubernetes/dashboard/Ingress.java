@@ -4,49 +4,37 @@ import io.kubernetes.client.ApiException;
 import io.kubernetes.client.custom.IntOrString;
 import io.kubernetes.client.models.*;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.vogel.kubernetes.dashboard.FormatUtils.*;
+import static org.apache.commons.lang3.StringUtils.*;
+import static org.vogel.kubernetes.dashboard.FormatUtils.describeBackend;
 
 @Getter
-public class Ingress {
-    private String name;
+public class Ingress extends Metadata {
     private String hosts;
     private String addresses;
     private String ports;
-    private String age;
-    private String namespace;
     private String defaultBackend;
     private List<String> tls;
     private List<IngressRule> rules;
-    private List<String> annotations;
-    private String uid;
 
     public Ingress(V1beta1Ingress ingress) {
-        V1ObjectMeta metadata = ingress.getMetadata();
+        super(ingress.getMetadata());
         V1beta1IngressSpec ingressSpec = ingress.getSpec();
         V1beta1IngressStatus ingressStatus = ingress.getStatus();
-        name = metadata.getName();
         List<V1beta1IngressRule> ingressRules = ingressSpec.getRules();
         hosts = formatHosts(ingressRules);
         addresses = loadBalancerStatusStringer(ingressStatus.getLoadBalancer());
         List<V1beta1IngressTLS> specTls = ingressSpec.getTls();
         ports = formatPorts(specTls);
-        DateTime creationTimestamp = metadata.getCreationTimestamp();
-        age = translateTimestamp(creationTimestamp);
 
-        namespace = metadata.getNamespace();
         if (specTls != null && specTls.size() != 0) {
             describeIngressTLS(specTls);
         }
-        annotations = printMultiline(metadata.getAnnotations());
-        uid = metadata.getUid();
     }
 
     public Ingress(V1beta1Ingress ingress, KubernetesUtils kubernetesUtils) throws ApiException {
@@ -69,7 +57,7 @@ public class Ingress {
             } else {
                 servicePort = backendServicePort.getStrValue();
             }
-            ns = namespace;
+            ns = getNamespace();
         }
         String describeBackend = describeBackend(ns, serviceName, servicePort, kubernetesUtils);
         defaultBackend = String.format("%s:%s (%s)", serviceName, servicePort, describeBackend);
@@ -85,7 +73,7 @@ public class Ingress {
 
     private String formatHosts(List<V1beta1IngressRule> rules) {
         List<String> list = rules.stream()
-                .filter(rule -> StringUtils.isNotEmpty(rule.getHost()))
+                .filter(rule -> isNotEmpty(rule.getHost()))
                 .map(V1beta1IngressRule::getHost)
                 .collect(toList());
 
@@ -110,9 +98,9 @@ public class Ingress {
     }
 
     private String ingressToString(V1LoadBalancerIngress ing) {
-        if (StringUtils.isNotBlank(ing.getIp())) {
+        if (isNotBlank(ing.getIp())) {
             return ing.getIp();
-        } else if (StringUtils.isNotBlank(ing.getHostname())) {
+        } else if (isNotBlank(ing.getHostname())) {
             return ing.getHostname();
         }
 
@@ -133,7 +121,7 @@ public class Ingress {
             String tlsHosts = t.getHosts()
                     .stream()
                     .collect(joining(","));
-            if (StringUtils.isEmpty(t.getSecretName())) {
+            if (isEmpty(t.getSecretName())) {
                 tls.add(String.format("SNI routes %s", tlsHosts));
             } else {
                 tls.add(String.format("%s terminates %s", t.getSecretName(), tlsHosts));

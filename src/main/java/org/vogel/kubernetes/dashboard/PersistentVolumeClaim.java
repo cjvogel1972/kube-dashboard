@@ -7,38 +7,32 @@ import io.kubernetes.client.models.V1PersistentVolumeClaimSpec;
 import io.kubernetes.client.models.V1PersistentVolumeClaimStatus;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
-import static org.vogel.kubernetes.dashboard.FormatUtils.*;
+import static org.vogel.kubernetes.dashboard.FormatUtils.getAccessModesAsString;
+import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
 
 @Getter
-public class PersistentVolumeClaim {
-    private String name;
+public class PersistentVolumeClaim extends Metadata {
     private String status;
     private String volume;
     private String capacity;
     private String accessModes;
     private String storageClass;
-    private String age;
-    private String namespace;
     private String deletionTimestamp;
-    private List<String> labels;
-    private List<String> annotations;
     private String finalizers;
     private String volumeMode;
     private List<PersistentVolumeClaimCondition> conditions;
-    private String uid;
 
     public PersistentVolumeClaim(V1PersistentVolumeClaim pvc) {
+        super(pvc.getMetadata());
         V1ObjectMeta metadata = pvc.getMetadata();
         V1PersistentVolumeClaimSpec pvcSpec = pvc.getSpec();
         V1PersistentVolumeClaimStatus pvcStatus = pvc.getStatus();
 
-        name = metadata.getName();
         if (metadata.getDeletionTimestamp() != null) {
             this.status = "Terminating";
         } else {
@@ -54,13 +48,8 @@ public class PersistentVolumeClaim {
             capacity = storage.toSuffixedString();
         }
         storageClass = getPersistentVolumeClaimClass(pvc);
-        DateTime creationTimestamp = metadata.getCreationTimestamp();
-        age = translateTimestamp(creationTimestamp);
 
-        namespace = metadata.getNamespace();
         deletionTimestamp = translateTimestamp(metadata.getDeletionTimestamp());
-        labels = printMultiline(metadata.getLabels());
-        annotations = printMultiline(metadata.getAnnotations());
         if (metadata.getFinalizers() == null) {
             finalizers = "[]";
         } else {
@@ -74,7 +63,6 @@ public class PersistentVolumeClaim {
                     .map(PersistentVolumeClaimCondition::new)
                     .collect(toList());
         }
-        uid = metadata.getUid();
     }
 
     private String getPersistentVolumeClaimClass(V1PersistentVolumeClaim pvc) {

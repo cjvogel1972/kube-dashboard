@@ -13,20 +13,15 @@ import static org.vogel.kubernetes.dashboard.FormatUtils.printMultiline;
 import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
 
 @Getter
-public class Pod {
-    private String name;
+public class Pod extends Metadata {
     private String ready;
     private String reason;
     private int restarts;
-    private String age;
-    private String namespace;
     private Integer priority;
     private String priorityClassName;
     private String node;
     private String hostIp;
     private DateTime startTime;
-    private List<String> labels;
-    private List<String> annotations;
     private DateTime deletionTimestamp;
     private String deletionDuration;
     private long deletionGracePeriodSeconds;
@@ -42,9 +37,9 @@ public class Pod {
     private String qos;
     private List<String> nodeSelectors;
     private List<String> tolerations;
-    private String uid;
 
     public Pod(V1Pod pod) {
+        super(pod.getMetadata());
         restarts = 0;
         V1PodSpec podSpec = pod.getSpec();
         int totalContainers = podSpec.getContainers()
@@ -138,12 +133,8 @@ public class Pod {
             reason = "Terminating";
         }
 
-        name = metadata.getName();
         ready = String.format("%d/%d", readyContainers, totalContainers);
-        DateTime creationTimestamp = metadata.getCreationTimestamp();
-        age = translateTimestamp(creationTimestamp);
 
-        namespace = metadata.getNamespace();
         priority = podSpec.getPriority();
         if (priority != null) {
             priorityClassName = podSpec.getPriorityClassName();
@@ -151,8 +142,6 @@ public class Pod {
         node = podSpec.getNodeName();
         hostIp = podStatus.getHostIP();
         startTime = podStatus.getStartTime();
-        labels = printMultiline(metadata.getLabels());
-        annotations = printMultiline(metadata.getAnnotations());
 
         if (deletionTimestamp != null) {
             deletionDuration = translateTimestamp(deletionTimestamp);
@@ -199,7 +188,6 @@ public class Pod {
 
         nodeSelectors = printMultiline(podSpec.getNodeSelector());
         printPodTolerations(podSpec.getTolerations());
-        uid = metadata.getUid();
     }
 
     private void printPodTolerations(List<V1Toleration> podSpecTolerations) {

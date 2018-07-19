@@ -3,27 +3,19 @@ package org.vogel.kubernetes.dashboard;
 import io.kubernetes.client.models.*;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.vogel.kubernetes.dashboard.FormatUtils.printMultiline;
-import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
 
 @Getter
-public class Service {
-    private String name;
+public class Service extends Metadata {
     private String svcType;
     private String clusterIp;
     private String externalIp;
     private String ports;
-    private String age;
-    private String namespace;
-    private List<String> labels;
-    private List<String> annotations;
     private String selector;
     private String specExternalIp;
     private String loadBalancerIp;
@@ -34,13 +26,11 @@ public class Service {
     private String externalTrafficPolicy;
     private int healthCheckNodePort;
     private String loadBalancerSourceRanges;
-    private String uid;
 
     public Service(V1Service service) {
-        V1ObjectMeta metadata = service.getMetadata();
+        super(service.getMetadata());
         V1ServiceSpec serviceSpec = service.getSpec();
         V1ServiceStatus serviceStatus = service.getStatus();
-        name = metadata.getName();
         svcType = serviceSpec.getType();
         clusterIp = serviceSpec.getClusterIP();
         if (StringUtils.isBlank(clusterIp)) {
@@ -48,12 +38,7 @@ public class Service {
         }
         externalIp = getServiceExternalIP(service);
         ports = makePortString(serviceSpec.getPorts());
-        DateTime creationTimestamp = metadata.getCreationTimestamp();
-        age = translateTimestamp(creationTimestamp);
 
-        namespace = metadata.getNamespace();
-        labels = printMultiline(metadata.getLabels());
-        annotations = printMultiline(metadata.getAnnotations());
         if (serviceSpec.getSelector() != null) {
             selector = serviceSpec.getSelector()
                     .entrySet()
@@ -86,7 +71,6 @@ public class Service {
                     .stream()
                     .collect(joining(","));
         }
-        uid = metadata.getUid();
     }
 
     public Service(V1Service service, V1Endpoints endpointsList) {

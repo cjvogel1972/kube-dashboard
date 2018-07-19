@@ -3,16 +3,13 @@ package org.vogel.kubernetes.dashboard;
 import io.kubernetes.client.custom.Quantity;
 import io.kubernetes.client.models.*;
 import lombok.Getter;
-import org.joda.time.DateTime;
 
-import java.util.List;
 import java.util.Map;
 
 import static org.vogel.kubernetes.dashboard.FormatUtils.*;
 
 @Getter
-public class PersistentVolume {
-    private String name;
+public class PersistentVolume extends Metadata {
     private String capacity;
     private String accessModes;
     private String reclaimPolicy;
@@ -20,22 +17,18 @@ public class PersistentVolume {
     private String claim;
     private String storageClass;
     private String reason;
-    private String age;
-    private List<String> labels;
-    private List<String> annotations;
     private String finalizers;
     private String deletionTimestamp;
     private String nodeAffinity;
     private String message;
     private Map<String, String> source;
-    private String uid;
 
     public PersistentVolume(V1PersistentVolume pv) {
+        super(pv.getMetadata());
         V1ObjectMeta metadata = pv.getMetadata();
         V1PersistentVolumeSpec pvSpec = pv.getSpec();
         V1PersistentVolumeStatus pvStatus = pv.getStatus();
 
-        name = metadata.getName();
         Quantity quantity = pvSpec.getCapacity()
                 .get("storage");
         capacity = quantity.toSuffixedString();
@@ -52,11 +45,7 @@ public class PersistentVolume {
         }
         storageClass = getPersistentVolumeClass(pv);
         reason = pvStatus.getReason();
-        DateTime creationTimestamp = metadata.getCreationTimestamp();
-        age = translateTimestamp(creationTimestamp);
 
-        labels = printMultiline(metadata.getLabels());
-        annotations = printMultiline(metadata.getAnnotations());
         if (metadata.getFinalizers() == null) {
             finalizers = "[]";
         } else {
@@ -66,7 +55,6 @@ public class PersistentVolume {
         deletionTimestamp = translateTimestamp(metadata.getDeletionTimestamp());
         message = pvStatus.getMessage();
         source = determineSource(pvSpec);
-        uid = metadata.getUid();
     }
 
     private String getPersistentVolumeClass(V1PersistentVolume pv) {
