@@ -6,6 +6,8 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 @Getter
 public class ConfigMap extends Metadata {
     private int dataSize;
@@ -13,10 +15,7 @@ public class ConfigMap extends Metadata {
 
     public ConfigMap(V1ConfigMap cm) {
         super(cm.getMetadata());
-        data = cm.getData();
-        if (data == null) {
-            data = new HashMap<>();
-        }
+        data = defaultIfNull(cm.getData(), new HashMap<>());
         dataSize = data.size();
     }
 }
