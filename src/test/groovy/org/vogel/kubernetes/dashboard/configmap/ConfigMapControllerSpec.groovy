@@ -1,9 +1,10 @@
-package org.vogel.kubernetes.dashboard
+package org.vogel.kubernetes.dashboard.configmap
 
 import io.kubernetes.client.ApiException
 import io.kubernetes.client.models.V1ConfigMap
 import io.kubernetes.client.models.V1ObjectMeta
 import org.springframework.ui.Model
+import org.vogel.kubernetes.dashboard.KubernetesUtils
 import spock.lang.Specification
 
 class ConfigMapControllerSpec extends Specification {

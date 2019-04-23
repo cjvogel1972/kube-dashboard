@@ -1,4 +1,4 @@
-package org.vogel.kubernetes.dashboard
+package org.vogel.kubernetes.dashboard.configmap
 
 import io.kubernetes.client.models.V1ConfigMap
 import io.kubernetes.client.models.V1ObjectMeta

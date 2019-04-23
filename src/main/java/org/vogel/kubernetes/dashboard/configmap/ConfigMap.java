@@ -1,7 +1,8 @@
-package org.vogel.kubernetes.dashboard;
+package org.vogel.kubernetes.dashboard.configmap;
 
 import io.kubernetes.client.models.V1ConfigMap;
 import lombok.Getter;
+import org.vogel.kubernetes.dashboard.Metadata;
 
 import java.util.HashMap;
 import java.util.Map;
