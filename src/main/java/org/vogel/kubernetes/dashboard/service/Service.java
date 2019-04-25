@@ -1,8 +1,9 @@
-package org.vogel.kubernetes.dashboard;
+package org.vogel.kubernetes.dashboard.service;
 
 import io.kubernetes.client.models.*;
 import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
+import org.vogel.kubernetes.dashboard.Metadata;
 
 import java.util.ArrayList;
 import java.util.List;

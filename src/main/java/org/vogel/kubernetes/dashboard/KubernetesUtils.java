@@ -10,6 +10,8 @@ import io.kubernetes.client.apis.ExtensionsV1beta1Api;
 import io.kubernetes.client.models.*;
 import io.kubernetes.client.util.Config;
 import org.springframework.stereotype.Component;
+import org.vogel.kubernetes.dashboard.configmap.ConfigMap;
+import org.vogel.kubernetes.dashboard.service.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -204,7 +206,7 @@ public class KubernetesUtils {
     }
 
     private String printReplicaSetsByLabels(List<V1beta2ReplicaSet> replicaSets) {
-        if (replicaSets.size() == 0) {
+        if (replicaSets.isEmpty()) {
             return "<none>";
         } else {
             return replicaSets.stream()

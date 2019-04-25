@@ -1,4 +1,4 @@
-package org.vogel.kubernetes.dashboard
+package org.vogel.kubernetes.dashboard.service
 
 import io.kubernetes.client.custom.IntOrString
 import io.kubernetes.client.models.*
