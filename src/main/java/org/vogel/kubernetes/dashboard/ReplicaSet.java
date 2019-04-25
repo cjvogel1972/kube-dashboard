@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.vogel.kubernetes.dashboard.FormatUtils.formatLabelSelector;
 
 @Getter
@@ -43,8 +44,7 @@ public class ReplicaSet extends Metadata {
             }
         }
 
-        if (replicaSetStatus.getConditions() != null && replicaSetStatus.getConditions()
-                .size() > 0) {
+        if (isNotEmpty(replicaSetStatus.getConditions())) {
             conditions = new ArrayList<>();
             for (V1beta2ReplicaSetCondition c : replicaSetStatus.getConditions()) {
                 conditions.add(new ReplicaSetCondition(c.getType(), c.getStatus(), c.getReason()));

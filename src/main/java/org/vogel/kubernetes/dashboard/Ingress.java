@@ -4,6 +4,7 @@ import io.kubernetes.client.ApiException;
 import io.kubernetes.client.custom.IntOrString;
 import io.kubernetes.client.models.*;
 import lombok.Getter;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class Ingress extends Metadata {
         List<V1beta1IngressTLS> specTls = ingressSpec.getTls();
         ports = formatPorts(specTls);
 
-        if (specTls != null && specTls.size() != 0) {
+        if (CollectionUtils.isNotEmpty(specTls)) {
             describeIngressTLS(specTls);
         }
     }
@@ -78,7 +79,7 @@ public class Ingress extends Metadata {
                 .map(V1beta1IngressRule::getHost)
                 .collect(toList());
 
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             return "*";
         } else {
             return joinListWithCommas(list);
@@ -108,7 +109,7 @@ public class Ingress extends Metadata {
     }
 
     private String formatPorts(List<V1beta1IngressTLS> tls) {
-        if (tls != null && tls.size() != 0) {
+        if (CollectionUtils.isNotEmpty(tls)) {
             return "80, 443";
         } else {
             return "80";

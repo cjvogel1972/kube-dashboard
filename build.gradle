@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.0.1.RELEASE'
+        springBootVersion = '2.1.4.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -30,12 +30,14 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile('org.springframework.boot:spring-boot-starter-web')
-    compile 'io.kubernetes:client-java:1.0.0'
+    compile 'io.kubernetes:client-java:3.0.0'
     compile 'commons-io:commons-io:2.6'
+    compile 'org.apache.commons:commons-collections4:4.2'
     runtime 'org.webjars:bootstrap:4.1.0'
     runtime 'org.webjars:font-awesome:5.0.13'
     runtime('org.springframework.boot:spring-boot-devtools')
-    compileOnly 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok:1.18.2'
+    annotationProcessor 'org.projectlombok:lombok:1.18.2'
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
 }

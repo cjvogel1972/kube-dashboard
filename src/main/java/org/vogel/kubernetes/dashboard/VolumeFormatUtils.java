@@ -3,6 +3,7 @@ package org.vogel.kubernetes.dashboard;
 import io.kubernetes.client.models.*;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
@@ -89,23 +90,40 @@ public class VolumeFormatUtils {
     }
 
     public static Map<String, String> printISCSIVolumeSource(V1ISCSIVolumeSource iscsi) {
+        return printISCSI(iscsi.getTargetPortal(), iscsi.getIqn(), iscsi.getLun(), iscsi.getIscsiInterface(),
+                          iscsi.getFsType(), iscsi.isReadOnly(), iscsi.getPortals(),
+                          iscsi.isChapAuthDiscovery(), iscsi.isChapAuthSession(), iscsi.getSecretRef()
+                                  .getName(), iscsi.getInitiatorName());
+    }
+
+    public static Map<String, String> printISCSIPersistentVolumeSource(V1ISCSIPersistentVolumeSource iscsi) {
+        return printISCSI(iscsi.getTargetPortal(), iscsi.getIqn(), iscsi.getLun(), iscsi.getIscsiInterface(),
+                          iscsi.getFsType(), iscsi.isReadOnly(), iscsi.getPortals(),
+                          iscsi.isChapAuthDiscovery(),
+                          iscsi.isChapAuthSession(), iscsi.getSecretRef()
+                                  .getName(), iscsi.getInitiatorName());
+    }
+
+    private static Map<String, String> printISCSI(String targetPortal, String iqn, Integer lun,
+                                                  String iscsiInterface, String fsType, Boolean readOnly,
+                                                  List<String> portals2, Boolean chapAuthDiscovery,
+                                                  Boolean chapAuthSession, String name, String initiatorName) {
         Map<String, String> info = new LinkedHashMap<>();
         info.put("Type:",
                  "ISCSI (an ISCSI Disk resource that is attached to a kubelet's host machine and then exposed to the pod)");
-        info.put("TargetPortal:", iscsi.getTargetPortal());
-        info.put("IQN:", iscsi.getIqn());
-        info.put("Lun:", iscsi.getLun()
+        info.put("TargetPortal:", targetPortal);
+        info.put("IQN:", iqn);
+        info.put("Lun:", lun
                 .toString());
-        info.put("ISCSIInterface:", iscsi.getIscsiInterface());
-        info.put("FSType:", iscsi.getFsType());
-        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(iscsi.isReadOnly())));
-        String portals = joinListWithCommas(iscsi.getPortals());
+        info.put("ISCSIInterface:", iscsiInterface);
+        info.put("FSType:", fsType);
+        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(readOnly)));
+        String portals = joinListWithCommas(portals2);
         info.put("Portals:", portals);
-        info.put("DiscoveryCHAPAuth:", Boolean.toString(Boolean.TRUE.equals(iscsi.isChapAuthDiscovery())));
-        info.put("SessionCHAPAuth:", Boolean.toString(Boolean.TRUE.equals(iscsi.isChapAuthSession())));
-        info.put("SecretRef:", iscsi.getSecretRef()
-                .getName());
-        info.put("InitiatorName:", iscsi.getInitiatorName());
+        info.put("DiscoveryCHAPAuth:", Boolean.toString(Boolean.TRUE.equals(chapAuthDiscovery)));
+        info.put("SessionCHAPAuth:", Boolean.toString(Boolean.TRUE.equals(chapAuthSession)));
+        info.put("SecretRef:", name);
+        info.put("InitiatorName:", initiatorName);
 
         return info;
     }
@@ -131,18 +149,32 @@ public class VolumeFormatUtils {
     }
 
     public static Map<String, String> printRBDVolumeSource(V1RBDVolumeSource rbd) {
+        return printRBD(rbd.getMonitors(), rbd.getImage(), rbd.getFsType(), rbd.getPool(), rbd.getUser(),
+                        rbd.getKeyring(), rbd.getSecretRef()
+                                .getName(), rbd.isReadOnly());
+    }
+
+    public static Map<String, String> printRBDPersistentVolumeSource(V1RBDPersistentVolumeSource rbd) {
+        return printRBD(rbd.getMonitors(), rbd.getImage(), rbd.getFsType(), rbd.getPool(), rbd.getUser(),
+                        rbd.getKeyring(),
+                        rbd.getSecretRef()
+                                .getName(), rbd.isReadOnly());
+    }
+
+    private static Map<String, String> printRBD(List<String> monitors2, String image, String fsType,
+                                                String pool, String user, String keyring, String name,
+                                                Boolean readOnly) {
         Map<String, String> info = new LinkedHashMap<>();
         info.put("Type:", "RBD (a Rados Block Device mount on the host that shares a pod's lifetime)");
-        String monitors = joinListWithCommas(rbd.getMonitors());
+        String monitors = joinListWithCommas(monitors2);
         info.put("CephMonitors:", monitors);
-        info.put("RBDImage:", rbd.getImage());
-        info.put("FSType:", rbd.getFsType());
-        info.put("RBDPool:", rbd.getPool());
-        info.put("RadosUser:", rbd.getUser());
-        info.put("Keyring:", rbd.getKeyring());
-        info.put("SecretRef:", rbd.getSecretRef()
-                .getName());
-        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(rbd.isReadOnly())));
+        info.put("RBDImage:", image);
+        info.put("FSType:", fsType);
+        info.put("RBDPool:", pool);
+        info.put("RadosUser:", user);
+        info.put("Keyring:", keyring);
+        info.put("SecretRef:", name);
+        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(readOnly)));
 
         return info;
     }
@@ -198,11 +230,19 @@ public class VolumeFormatUtils {
     }
 
     public static Map<String, String> printCinderVolumeSource(V1CinderVolumeSource cinder) {
+        return printCinder(cinder.getVolumeID(), cinder.getFsType(), cinder.isReadOnly());
+    }
+
+    public static Map<String, String> printCinderPersistentVolumeSource(V1CinderPersistentVolumeSource cinder) {
+        return printCinder(cinder.getVolumeID(), cinder.getFsType(), cinder.isReadOnly());
+    }
+
+    private static Map<String, String> printCinder(String volumeID, String fsType, Boolean readOnly) {
         Map<String, String> info = new LinkedHashMap<>();
         info.put("Type:", "Cinder (a Persistent Disk resource in OpenStack)");
-        info.put("VolumeID:", cinder.getVolumeID());
-        info.put("FSType:", cinder.getFsType());
-        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(cinder.isReadOnly())));
+        info.put("VolumeID:", volumeID);
+        info.put("FSType:", fsType);
+        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(readOnly)));
 
         return info;
     }
@@ -267,54 +307,51 @@ public class VolumeFormatUtils {
     }
 
     public static Map<String, String> printCephFSVolumeSource(V1CephFSVolumeSource cephfs) {
-        Map<String, String> info = new LinkedHashMap<>();
-        info.put("Type:", "CephFS (a CephFS mount on the host that shares a pod's lifetime)");
-        String monitors = joinListWithCommas(cephfs.getMonitors());
-        info.put("Monitors:", monitors);
-        info.put("Path:", cephfs.getPath());
-        info.put("User:", cephfs.getUser());
-        info.put("SecretFile:", cephfs.getSecretFile());
-        info.put("SecretRef:", cephfs.getSecretRef()
-                .getName());
-        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(cephfs.isReadOnly())));
-
-        return info;
+        return printCephFS(cephfs.getMonitors(), cephfs.getPath(), cephfs.getUser(), cephfs.getSecretFile(),
+                           cephfs.getSecretRef()
+                                   .getName(), cephfs.isReadOnly());
     }
 
     public static Map<String, String> printCephFSPersistentVolumeSource(V1CephFSPersistentVolumeSource cephfs) {
+        return printCephFS(cephfs.getMonitors(), cephfs.getPath(), cephfs.getUser(), cephfs.getSecretFile(),
+                           cephfs.getSecretRef()
+                                   .getName(), cephfs.isReadOnly());
+    }
+
+    private static Map<String, String> printCephFS(List<String> cephMonitors, String path, String user,
+                                                   String secretFile, String name, Boolean readOnly) {
         Map<String, String> info = new LinkedHashMap<>();
         info.put("Type:", "CephFS (a CephFS mount on the host that shares a pod's lifetime)");
-        String monitors = joinListWithCommas(cephfs.getMonitors());
+        String monitors = joinListWithCommas(cephMonitors);
         info.put("Monitors:", monitors);
-        info.put("Path:", cephfs.getPath());
-        info.put("User:", cephfs.getUser());
-        info.put("SecretFile:", cephfs.getSecretFile());
-        info.put("SecretRef:", cephfs.getSecretRef()
-                .getName());
-        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(cephfs.isReadOnly())));
+        info.put("Path:", path);
+        info.put("User:", user);
+        info.put("SecretFile:", secretFile);
+        info.put("SecretRef:", name);
+        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(readOnly)));
 
         return info;
     }
 
     public static Map<String, String> printStorageOSVolumeSource(V1StorageOSVolumeSource storageos) {
-        Map<String, String> info = new LinkedHashMap<>();
-        info.put("Type:", "StorageOS (a StorageOS Persistent Disk resource)");
-        info.put("VolumeName:", storageos.getVolumeName());
-        info.put("VolumeNamespace:", storageos.getVolumeNamespace());
-        info.put("FSType:", storageos.getFsType());
-        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(storageos.isReadOnly())));
-
-        return info;
+        return printStorageOS(storageos.getVolumeName(), storageos.getVolumeNamespace(), storageos.getFsType(),
+                              storageos.isReadOnly());
     }
 
     public static Map<String, String> printStorageOSPersistentVolumeSource(
             V1StorageOSPersistentVolumeSource storageos) {
+        return printStorageOS(storageos.getVolumeName(), storageos.getVolumeNamespace(), storageos.getFsType(),
+                              storageos.isReadOnly());
+    }
+
+    private static Map<String, String> printStorageOS(String volumeName, String volumeNamespace, String fsType,
+                                                      Boolean readOnly) {
         Map<String, String> info = new LinkedHashMap<>();
         info.put("Type:", "StorageOS (a StorageOS Persistent Disk resource)");
-        info.put("VolumeName:", storageos.getVolumeName());
-        info.put("VolumeNamespace:", storageos.getVolumeNamespace());
-        info.put("FSType:", storageos.getFsType());
-        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(storageos.isReadOnly())));
+        info.put("VolumeName:", volumeName);
+        info.put("VolumeNamespace:", volumeNamespace);
+        info.put("FSType:", fsType);
+        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(readOnly)));
 
         return info;
     }
@@ -363,15 +400,25 @@ public class VolumeFormatUtils {
     }
 
     public static Map<String, String> printFlexVolumeSource(V1FlexVolumeSource flex) {
+        return printStorageOS(flex.getDriver(), flex.getFsType(), flex.getSecretRef()
+                .getName(), flex.isReadOnly(), flex.getOptions());
+    }
+
+    public static Map<String, String> printFlexPersistentVolumeSource(V1FlexPersistentVolumeSource flex) {
+        return printStorageOS(flex.getDriver(), flex.getFsType(), flex.getSecretRef()
+                .getName(), flex.isReadOnly(), flex.getOptions());
+    }
+
+    private static Map<String, String> printStorageOS(String driver, String fsType, String name, Boolean readOnly,
+                                                      Map<String, String> options) {
         Map<String, String> info = new LinkedHashMap<>();
         info.put("Type:",
                  "FlexVolume (a generic volume resource that is provisioned/attached using an exec based plugin)");
-        info.put("Driver:", flex.getDriver());
-        info.put("FSType:", flex.getFsType());
-        info.put("SecretRef:", flex.getSecretRef()
-                .getName());
-        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(flex.isReadOnly())));
-        info.put("Options:", flex.getOptions()
+        info.put("Driver:", driver);
+        info.put("FSType:", fsType);
+        info.put("SecretRef:", name);
+        info.put("ReadOnly:", Boolean.toString(Boolean.TRUE.equals(readOnly)));
+        info.put("Options:", options
                 .toString());
 
         return info;

@@ -73,25 +73,23 @@ public class Requirement {
 
     private void validateLabelKey(String key) throws RequirementException {
         List<String> errs = isQualifiedName(key);
-        if (errs.size() != 0) {
-            String errMsg = String.format("invalid label key %s:%s", key, errs.stream()
-                    .collect(joining(", ")));
+        if (!errs.isEmpty()) {
+            String errMsg = String.format("invalid label key %s:%s", key, String.join(", ", errs));
             throw new RequirementException(errMsg);
         }
     }
 
     private void validateLabelValue(String value) throws RequirementException {
         List<String> errs = isValidLabelValue(value);
-        if (errs.size() != 0) {
-            String errMsg = String.format("invalid label value %s:%s", key, errs.stream()
-                    .collect(joining(", ")));
+        if (!errs.isEmpty()) {
+            String errMsg = String.format("invalid label value %s:%s", key, String.join(", ", errs));
             throw new RequirementException(errMsg);
         }
     }
 
     private void validateOperation(String operation, List<String> values) throws RequirementException {
         if (equalsAny(operation, "in", "notin")) {
-            if (values.size() == 0) {
+            if (values.isEmpty()) {
                 throw new RequirementException("for 'in', 'notin' operators, values set can't be empty");
             }
         } else if (equalsAny(operation, "=", "==", "!=")) {
@@ -99,7 +97,7 @@ public class Requirement {
                 throw new RequirementException("exact-match compatibility requires one single value");
             }
         } else if (equalsAny(operation, "exists", "!")) {
-            if (values.size() != 0) {
+            if (!values.isEmpty()) {
                 throw new RequirementException("values set must be empty for exists and does not exist");
             }
         } else if (equalsAny(operation, "gt", "lt")) {
@@ -137,7 +135,7 @@ public class Requirement {
                 errs.add("prefix part must be non-empty");
             } else {
                 List<String> msgs = isDNS1123Subdomain(prefix);
-                if (msgs.size() != 0) {
+                if (!msgs.isEmpty()) {
                     msgs.stream()
                             .map(msg -> String.format("prefix part %s", msg))
                             .forEach(errs::add);

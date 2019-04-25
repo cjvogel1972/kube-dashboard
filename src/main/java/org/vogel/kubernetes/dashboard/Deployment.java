@@ -6,6 +6,8 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.vogel.kubernetes.dashboard.FormatUtils.formatLabelSelector;
 
 @Getter
@@ -30,8 +32,8 @@ public class Deployment extends Metadata {
         V1beta2DeploymentSpec deploymentSpec = deployment.getSpec();
         V1beta2DeploymentStatus deploymentStatus = deployment.getStatus();
         desired = deploymentSpec.getReplicas();
-        current = deploymentStatus.getReplicas();
-        updated = deploymentStatus.getUpdatedReplicas();
+        current = defaultIfNull(deploymentStatus.getReplicas(), 0);
+        updated = defaultIfNull(deploymentStatus.getUpdatedReplicas(), 0);
         if (deploymentStatus.getAvailableReplicas() != null) {
             available = deploymentStatus.getAvailableReplicas();
         }
@@ -56,8 +58,7 @@ public class Deployment extends Metadata {
 
         podTemplate = new PodTemplate(deploymentSpec.getTemplate());
 
-        if (deploymentStatus.getConditions() != null && deploymentStatus.getConditions()
-                .size() > 0) {
+        if (isNotEmpty(deploymentStatus.getConditions())) {
             conditions = new ArrayList<>();
             for (V1beta2DeploymentCondition c : deploymentStatus.getConditions()) {
                 conditions.add(new DeploymentCondition(c.getType(), c.getStatus(), c.getReason()));

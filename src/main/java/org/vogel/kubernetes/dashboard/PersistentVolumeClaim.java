@@ -6,6 +6,7 @@ import io.kubernetes.client.models.V1PersistentVolumeClaim;
 import io.kubernetes.client.models.V1PersistentVolumeClaimSpec;
 import io.kubernetes.client.models.V1PersistentVolumeClaimStatus;
 import lombok.Getter;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -56,8 +57,7 @@ public class PersistentVolumeClaim extends Metadata {
             finalizers = metadata.getFinalizers()
                     .toString();
         }
-        if (pvcStatus.getConditions() != null && pvcStatus.getConditions()
-                .size() > 0) {
+        if (CollectionUtils.isNotEmpty(pvcStatus.getConditions())) {
             conditions = pvcStatus.getConditions()
                     .stream()
                     .map(PersistentVolumeClaimCondition::new)

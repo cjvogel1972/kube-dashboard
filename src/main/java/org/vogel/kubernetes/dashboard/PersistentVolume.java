@@ -81,11 +81,11 @@ public class PersistentVolume extends Metadata {
         } else if (pvSpec.getNfs() != null) {
             info = printNFSVolumeSource(pvSpec.getNfs());
         } else if (pvSpec.getIscsi() != null) {
-            info = printISCSIVolumeSource(pvSpec.getIscsi());
+            info = printISCSIPersistentVolumeSource(pvSpec.getIscsi());
         } else if (pvSpec.getGlusterfs() != null) {
             info = printGlusterfsVolumeSource(pvSpec.getGlusterfs());
         } else if (pvSpec.getRbd() != null) {
-            info = printRBDVolumeSource(pvSpec.getRbd());
+            info = printRBDPersistentVolumeSource(pvSpec.getRbd());
         } else if (pvSpec.getQuobyte() != null) {
             info = printQuobyteVolumeSource(pvSpec.getQuobyte());
         } else if (pvSpec.getAzureDisk() != null) {
@@ -93,7 +93,7 @@ public class PersistentVolume extends Metadata {
         } else if (pvSpec.getVsphereVolume() != null) {
             info = printVsphereVolumeSource(pvSpec.getVsphereVolume());
         } else if (pvSpec.getCinder() != null) {
-            info = printCinderVolumeSource(pvSpec.getCinder());
+            info = printCinderPersistentVolumeSource(pvSpec.getCinder());
         } else if (pvSpec.getPhotonPersistentDisk() != null) {
             info = printPhotonPersistentDiskVolumeSource(pvSpec.getPhotonPersistentDisk());
         } else if (pvSpec.getPortworxVolume() != null) {
@@ -109,7 +109,7 @@ public class PersistentVolume extends Metadata {
         } else if (pvSpec.getAzureFile() != null) {
             info = printAzureFilePersistentVolumeSource(pvSpec.getAzureFile());
         } else if (pvSpec.getFlexVolume() != null) {
-            info = printFlexVolumeSource(pvSpec.getFlexVolume());
+            info = printFlexPersistentVolumeSource(pvSpec.getFlexVolume());
         } else if (pvSpec.getFlocker() != null) {
             info = printFlockerVolumeSource(pvSpec.getFlocker());
         }
