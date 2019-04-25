@@ -1,8 +1,6 @@
 package org.vogel.kubernetes.dashboard.configmap
 
 import io.kubernetes.client.ApiException
-import io.kubernetes.client.models.V1ConfigMap
-import io.kubernetes.client.models.V1ObjectMeta
 import org.springframework.ui.Model
 import org.vogel.kubernetes.dashboard.KubernetesUtils
 import spock.lang.Specification
@@ -11,12 +9,7 @@ class ConfigMapControllerSpec extends Specification {
     def "test getting a list of ConfigMaps"() {
         given:
         def kubeUtil = Mock(KubernetesUtils)
-        def kubeConfigMap = Mock(V1ConfigMap)
-        def metadata = Mock(V1ObjectMeta)
-        kubeConfigMap.metadata >> metadata
-        def data = [foo: 'bar', bar: 'foo']
-        kubeConfigMap.data >> data
-        def resultConfigMap = new ConfigMap(kubeConfigMap)
+        def resultConfigMap = Mock(ConfigMap)
         def resultList = [resultConfigMap]
         kubeUtil.getConfigMaps("default") >> resultList
         def namespaces = ["default", "kube-system"]
@@ -51,12 +44,7 @@ class ConfigMapControllerSpec extends Specification {
     def "test describing a ConfigMap"() {
         given:
         def kubeUtil = Mock(KubernetesUtils)
-        def kubeConfigMap = Mock(V1ConfigMap)
-        def metadata = Mock(V1ObjectMeta)
-        kubeConfigMap.metadata >> metadata
-        def data = [foo: 'bar', bar: 'foo']
-        kubeConfigMap.data >> data
-        def resultConfigMap = new ConfigMap(kubeConfigMap)
+        def resultConfigMap = Mock(ConfigMap)
         kubeUtil.getConfigMap("default", "my-config-map") >> resultConfigMap
         def controller = new ConfigMapController(kubeUtil)
         def model = Mock(Model)
