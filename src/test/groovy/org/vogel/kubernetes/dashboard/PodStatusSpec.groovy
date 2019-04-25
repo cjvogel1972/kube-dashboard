@@ -20,7 +20,9 @@ class PodStatusSpec extends Specification {
         pods << pod4
         V1Pod pod5 = createPod("5678", "Running")
         pods << pod5
-        KubernetesUtils kubeUtils = new KubernetesUtils()
+        KubernetesUtils kubeUtils = Mock(KubernetesUtils)
+        4 * kubeUtils.isControlledBy(_, "1234") >> Boolean.TRUE
+        1 * kubeUtils.isControlledBy(*_) >> Boolean.FALSE
 
         when:
         def podStatus = new PodStatus(pods, "1234", kubeUtils)
