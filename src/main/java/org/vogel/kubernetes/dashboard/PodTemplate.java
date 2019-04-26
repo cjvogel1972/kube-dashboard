@@ -23,11 +23,7 @@ public class PodTemplate {
     public PodTemplate(V1PodTemplateSpec template) {
         V1ObjectMeta metadata = template.getMetadata();
         labels = printMultiline(metadata.getLabels());
-
-        if (metadata.getAnnotations() != null && metadata.getAnnotations()
-                .size() > 0) {
-            annotations = printMultiline(metadata.getAnnotations());
-        }
+        annotations = printMultiline(metadata.getAnnotations());
 
         if (isNotEmpty(template.getSpec()
                                .getServiceAccountName())) {
@@ -38,7 +34,7 @@ public class PodTemplate {
         List<V1Container> kubeInitContainers = template.getSpec()
                 .getInitContainers();
         if (kubeInitContainers != null) {
-            this.initContainers = kubeInitContainers.stream()
+            initContainers = kubeInitContainers.stream()
                     .map(container -> new Container(container, null))
                     .collect(toList());
         }

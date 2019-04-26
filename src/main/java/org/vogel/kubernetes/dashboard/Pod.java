@@ -2,6 +2,8 @@ package org.vogel.kubernetes.dashboard;
 
 import io.kubernetes.client.models.*;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.DateTime;
 import org.thymeleaf.util.StringUtils;
 
@@ -13,6 +15,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 import static org.vogel.kubernetes.dashboard.FormatUtils.printMultiline;
 import static org.vogel.kubernetes.dashboard.FormatUtils.translateTimestamp;
 
+@Slf4j
 @Getter
 public class Pod extends Metadata {
     private String ready;
@@ -57,38 +60,7 @@ public class Pod extends Metadata {
         boolean initializing = false;
         List<V1ContainerStatus> initContainerStatuses = podStatus.getInitContainerStatuses();
         if (initContainerStatuses != null) {
-            for (int i = 0; i < initContainerStatuses.size(); i++) {
-                V1ContainerStatus container = initContainerStatuses.get(i);
-                restarts += container.getRestartCount();
-
-                V1ContainerState containerState = container.getState();
-                V1ContainerStateTerminated terminated = containerState.getTerminated();
-                V1ContainerStateWaiting waiting = containerState.getWaiting();
-                if (terminated != null && terminated.getExitCode() == 0) {
-                    continue;
-                } else if (terminated != null) {
-                    // initialization is failed
-                    if (isBlank(terminated.getReason())) {
-                        if (terminated.getSignal() != 0) {
-                            reason = String.format("Init:Signal:%d", terminated.getSignal());
-                        } else {
-                            reason = String.format("Init:ExitCode:%d", terminated.getExitCode());
-                        }
-                    } else {
-                        reason = "Init:" + terminated.getReason();
-                    }
-                    initializing = true;
-                } else if (waiting != null && isNotBlank(waiting.getReason()) && !waiting.getReason()
-                        .equals("PodInitializing")) {
-                    reason = "Init:" + waiting.getReason();
-                    initializing = true;
-                } else {
-                    reason = String.format("Init:%d/%d", i, podSpec.getInitContainers()
-                            .size());
-                    initializing = true;
-                }
-                break;
-            }
+            initializing = processInitContainerStatuses(podSpec, initializing, initContainerStatuses);
         }
 
         List<V1ContainerStatus> containerStatuses = podStatus.getContainerStatuses();
@@ -108,7 +80,7 @@ public class Pod extends Metadata {
                     } else if (terminated != null && isNotEmpty(terminated.getReason())) {
                         reason = terminated.getReason();
                     } else if (terminated != null && isEmpty(terminated.getReason())) {
-                        if (terminated.getSignal() != 0) {
+                        if (terminated.getSignal() != null && terminated.getSignal() != 0) {
                             reason = String.format("Signal:%d", terminated.getSignal());
                         } else {
                             reason = String.format("ExitCode:%d", terminated.getExitCode());
@@ -128,15 +100,10 @@ public class Pod extends Metadata {
 
         V1ObjectMeta metadata = pod.getMetadata();
         deletionTimestamp = metadata.getDeletionTimestamp();
-        if (deletionTimestamp != null) {
-            deletionDuration = translateTimestamp(deletionTimestamp);
-            deletionGracePeriodSeconds = metadata.getDeletionGracePeriodSeconds();
-
-            if (StringUtils.equals("NodeLost", describeReason)) {
-                reason = "Unknown";
-            } else {
-                reason = "Terminating";
-            }
+        if (deletionTimestamp != null && StringUtils.equals("NodeLost", describeReason)) {
+            reason = "Unknown";
+        } else {
+            reason = "Terminating";
         }
 
         ready = String.format("%d/%d", readyContainers, totalContainers);
@@ -149,7 +116,13 @@ public class Pod extends Metadata {
         hostIp = podStatus.getHostIP();
         startTime = podStatus.getStartTime();
 
+        if (deletionTimestamp != null) {
+            deletionDuration = translateTimestamp(deletionTimestamp);
+            deletionGracePeriodSeconds = metadata.getDeletionGracePeriodSeconds();
+        }
+
         status = podStatus.getPhase();
+        log.info("status = {}", status);
         message = podStatus.getMessage();
         podIp = podStatus.getPodIP();
         List<V1OwnerReference> ownerReferences = metadata.getOwnerReferences();
@@ -175,9 +148,10 @@ public class Pod extends Metadata {
                 .collect(toList());
 
         List<V1PodCondition> podConditions = podStatus.getConditions();
-        if (podConditions != null) {
+        if (CollectionUtils.isNotEmpty(podConditions)) {
             conditions = podConditions.stream()
-                    .collect(toMap(V1PodCondition::getType, V1PodCondition::getStatus, null, LinkedHashMap::new));
+                    .collect(toMap(V1PodCondition::getType, V1PodCondition::getStatus, (p1, p2) -> p1,
+                                   LinkedHashMap::new));
         }
 
         volumes = new Volumes(podSpec.getVolumes());
@@ -190,8 +164,45 @@ public class Pod extends Metadata {
         printPodTolerations(podSpec.getTolerations());
     }
 
+    private boolean processInitContainerStatuses(V1PodSpec podSpec, boolean initializing,
+                                                 List<V1ContainerStatus> initContainerStatuses) {
+        for (int i = 0; i < initContainerStatuses.size(); i++) {
+            V1ContainerStatus container = initContainerStatuses.get(i);
+            restarts += container.getRestartCount();
+
+            V1ContainerState containerState = container.getState();
+            V1ContainerStateTerminated terminated = containerState.getTerminated();
+            V1ContainerStateWaiting waiting = containerState.getWaiting();
+            if (terminated != null && terminated.getExitCode() == 0) {
+                continue;
+            } else if (terminated != null) {
+                // initialization is failed
+                if (isBlank(terminated.getReason())) {
+                    if (terminated.getSignal() != 0) {
+                        reason = String.format("Init:Signal:%d", terminated.getSignal());
+                    } else {
+                        reason = String.format("Init:ExitCode:%d", terminated.getExitCode());
+                    }
+                } else {
+                    reason = "Init:" + terminated.getReason();
+                }
+                initializing = true;
+            } else if (waiting != null && isNotBlank(waiting.getReason()) && !waiting.getReason()
+                    .equals("PodInitializing")) {
+                reason = "Init:" + waiting.getReason();
+                initializing = true;
+            } else {
+                reason = String.format("Init:%d/%d", i, podSpec.getInitContainers()
+                        .size());
+                initializing = true;
+            }
+            break;
+        }
+        return initializing;
+    }
+
     private void printPodTolerations(List<V1Toleration> podSpecTolerations) {
-        if (podSpecTolerations != null && podSpecTolerations.size() > 0) {
+        if (CollectionUtils.isNotEmpty(podSpecTolerations)) {
             tolerations = new ArrayList<>();
             for (V1Toleration podToleration : podSpecTolerations) {
                 StringBuilder tol = new StringBuilder();

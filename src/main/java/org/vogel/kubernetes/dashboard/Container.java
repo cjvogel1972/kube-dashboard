@@ -1,14 +1,17 @@
 package org.vogel.kubernetes.dashboard;
 
+import io.kubernetes.client.custom.IntOrString;
 import io.kubernetes.client.custom.Quantity;
 import io.kubernetes.client.models.*;
 import lombok.Getter;
+import org.apache.commons.collections4.MapUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.vogel.kubernetes.dashboard.FormatUtils.joinListWithCommas;
 
@@ -33,6 +36,7 @@ public class Container {
     private List<ContainerEnvironmentFrom> envFrom = new ArrayList<>();
     private List<ContainerEnvironment> env = new ArrayList<>();
     private List<String> mounts = new ArrayList<>();
+    private List<Integer> containerPorts;
 
     public Container(V1Container kubeContainer, List<V1ContainerStatus> containerStatuses) {
         name = kubeContainer.getName();
@@ -51,8 +55,8 @@ public class Container {
         containerStatus.ifPresent(this::describeContainerState);
         describeContainerResource(kubeContainer.getResources());
         describeContainerProbe(kubeContainer);
-        if (kubeContainer.getEnvFrom() != null && kubeContainer.getEnvFrom()
-                .size() > 0) {
+        if (kubeContainer.getEnvFrom() != null && !kubeContainer.getEnvFrom()
+                .isEmpty()) {
             describeContainerEnvFrom(kubeContainer.getEnvFrom());
         }
         describeContainerEnvVars(kubeContainer);
@@ -61,8 +65,15 @@ public class Container {
 
     private void describeContainerBasicInfo(V1Container kubeContainer) {
         image = kubeContainer.getImage();
-        ports = describeContainerPorts(kubeContainer.getPorts());
-        hostPorts = describeContainerHostPorts(kubeContainer.getPorts());
+        List<V1ContainerPort> kubeContainerPorts = kubeContainer.getPorts();
+        if (kubeContainerPorts != null) {
+            containerPorts = kubeContainerPorts.stream()
+                    .filter(port -> port.getContainerPort() != null)
+                    .map(V1ContainerPort::getContainerPort)
+                    .collect(toList());
+        }
+        this.ports = describeContainerPorts(kubeContainerPorts);
+        hostPorts = describeContainerHostPorts(kubeContainerPorts);
     }
 
     private void describeContainerBasicStatusInfo(V1ContainerStatus status) {
@@ -71,25 +82,29 @@ public class Container {
     }
 
     private String describeContainerPorts(List<V1ContainerPort> ports) {
-        String result = null;
+        String result;
 
         if (ports != null) {
             result = ports.stream()
                     .map(port -> String.format("%d/%s", port.getContainerPort(), port.getProtocol()))
                     .collect(joining(","));
+        } else {
+            result = "";
         }
 
         return result;
     }
 
     private String describeContainerHostPorts(List<V1ContainerPort> ports) {
-        String result = null;
+        String result;
 
         if (ports != null) {
             result = ports.stream()
-                    .map(port -> String.format("%d/%s", port.getHostPort() == null ? 0 : port.getHostPort(),
+                    .map(port -> String.format("%d/%s", defaultIfNull(port.getHostPort(), 0),
                                                port.getProtocol()))
                     .collect(joining(","));
+        } else {
+            result = "";
         }
 
         return result;
@@ -113,20 +128,18 @@ public class Container {
 
     private void describeContainerResource(V1ResourceRequirements resources) {
         Map<String, Quantity> resourcesLimits = resources.getLimits();
-        if (resourcesLimits != null && resourcesLimits.size() > 0) {
+        if (MapUtils.isNotEmpty(resourcesLimits)) {
             limits = resourcesLimits
                     .keySet()
                     .stream()
-                    .sorted()
                     .collect(toMap(key -> key, key -> resourcesLimits.get(key)
                             .toSuffixedString()));
         }
         Map<String, Quantity> resourcesRequests = resources.getRequests();
-        if (resourcesRequests != null && resourcesRequests.size() > 0) {
+        if (MapUtils.isNotEmpty(resourcesRequests)) {
             requests = resourcesRequests
                     .keySet()
                     .stream()
-                    .sorted()
                     .collect(toMap(key -> key, key -> resourcesRequests.get(key)
                             .toSuffixedString()));
         }
@@ -153,11 +166,19 @@ public class Container {
         } else if (probe.getHttpGet() != null) {
             String url;
             V1HTTPGetAction httpGet = probe.getHttpGet();
-            if (httpGet.getPort() != null && httpGet.getPort()
-                    .getIntValue() > 0) {
-                url = String.format("%s://%s:%d/%s", httpGet.getScheme(), httpGet.getHost(), httpGet.getPort()
-                                            .getIntValue(),
-                                    httpGet.getPath());
+            if (httpGet.getPort() != null) {
+                IntOrString port = httpGet.getPort();
+                if (port.isInteger() && port.getIntValue() > 0) {
+                    url = String.format("%s://%s:%d/%s", httpGet.getScheme(), httpGet.getHost(), httpGet.getPort()
+                                                .getIntValue(),
+                                        httpGet.getPath());
+                } else if (!port.isInteger() && isBlank(port.getStrValue())) {
+                    url = String.format("%s://%s:%s/%s", httpGet.getScheme(), httpGet.getHost(), httpGet.getPort()
+                                                .getStrValue(),
+                                        httpGet.getPath());
+                } else {
+                    url = String.format("%s://%s/%s", httpGet.getScheme(), httpGet.getHost(), httpGet.getPath());
+                }
             } else {
                 url = String.format("%s://%s/%s", httpGet.getScheme(), httpGet.getHost(), httpGet.getPath());
             }
@@ -174,26 +195,26 @@ public class Container {
     }
 
     private void describeContainerEnvFrom(List<V1EnvFromSource> envFromSources) {
-        for (V1EnvFromSource env : envFromSources) {
-            String name = null;
+        for (V1EnvFromSource envFromSource : envFromSources) {
+            String envName = null;
             String from = null;
             Boolean optional = null;
-            String prefix = env.getPrefix();
-            if (env.getConfigMapRef() != null) {
+            String prefix = envFromSource.getPrefix();
+            if (envFromSource.getConfigMapRef() != null) {
                 from = " ConfigMap";
-                name = env.getConfigMapRef()
+                envName = envFromSource.getConfigMapRef()
                         .getName();
-                optional = Boolean.TRUE.equals(env.getConfigMapRef()
+                optional = Boolean.TRUE.equals(envFromSource.getConfigMapRef()
                                                        .isOptional());
-            } else if (env.getSecretRef() != null) {
+            } else if (envFromSource.getSecretRef() != null) {
                 from = " Secret";
-                name = env.getSecretRef()
+                envName = envFromSource.getSecretRef()
                         .getName();
-                optional = Boolean.TRUE.equals(env.getSecretRef()
+                optional = Boolean.TRUE.equals(envFromSource.getSecretRef()
                                                        .isOptional());
             }
-            if (isNotBlank(name)) {
-                ContainerEnvironmentFrom cef = new ContainerEnvironmentFrom(name, from, optional, prefix);
+            if (isNotBlank(envName)) {
+                ContainerEnvironmentFrom cef = new ContainerEnvironmentFrom(envName, from, optional, prefix);
                 envFrom.add(cef);
             }
         }

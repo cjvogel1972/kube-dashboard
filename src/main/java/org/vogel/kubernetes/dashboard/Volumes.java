@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.vogel.kubernetes.dashboard.VolumeFormatUtils.*;
 
 @Getter
@@ -14,7 +15,7 @@ public class Volumes {
     private Map<String, Map<String, String>> volumes;
 
     public Volumes(List<V1Volume> podVolumes) {
-        if (podVolumes != null && podVolumes.size() > 0) {
+        if (isNotEmpty(podVolumes)) {
             volumes = new HashMap<>();
             for (V1Volume volume : podVolumes) {
                 String volumeName = volume.getName();
