@@ -1,6 +1,7 @@
-package org.vogel.kubernetes.dashboard
+package org.vogel.kubernetes.dashboard.replicaset
 
 import io.kubernetes.client.models.*
+import org.vogel.kubernetes.dashboard.replicaset.ReplicaSet
 import spock.lang.Specification
 
 class ReplicaSetSpec extends Specification {

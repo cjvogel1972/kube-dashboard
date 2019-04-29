@@ -1,7 +1,10 @@
-package org.vogel.kubernetes.dashboard
+package org.vogel.kubernetes.dashboard.replicaset
 
 import io.kubernetes.client.ApiException
 import org.springframework.ui.Model
+import org.vogel.kubernetes.dashboard.KubernetesUtils
+import org.vogel.kubernetes.dashboard.replicaset.ReplicaSet
+import org.vogel.kubernetes.dashboard.replicaset.ReplicaSetController
 import spock.lang.Specification
 
 class ReplicaSetControllerSpec extends Specification {

@@ -1,4 +1,4 @@
-package org.vogel.kubernetes.dashboard;
+package org.vogel.kubernetes.dashboard.replicaset;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

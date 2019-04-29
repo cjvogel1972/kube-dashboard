@@ -11,6 +11,7 @@ import io.kubernetes.client.models.*;
 import io.kubernetes.client.util.Config;
 import org.springframework.stereotype.Component;
 import org.vogel.kubernetes.dashboard.configmap.ConfigMap;
+import org.vogel.kubernetes.dashboard.replicaset.ReplicaSet;
 import org.vogel.kubernetes.dashboard.service.Service;
 
 import java.io.IOException;
