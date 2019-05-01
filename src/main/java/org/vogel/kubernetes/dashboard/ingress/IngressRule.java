@@ -1,10 +1,11 @@
-package org.vogel.kubernetes.dashboard;
+package org.vogel.kubernetes.dashboard.ingress;
 
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.custom.IntOrString;
 import io.kubernetes.client.models.V1beta1HTTPIngressPath;
 import io.kubernetes.client.models.V1beta1IngressRule;
 import lombok.Getter;
+import org.vogel.kubernetes.dashboard.KubernetesUtils;
 
 import java.util.ArrayList;
 import java.util.List;

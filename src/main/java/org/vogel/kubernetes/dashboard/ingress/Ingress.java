@@ -1,10 +1,12 @@
-package org.vogel.kubernetes.dashboard;
+package org.vogel.kubernetes.dashboard.ingress;
 
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.custom.IntOrString;
 import io.kubernetes.client.models.*;
 import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
+import org.vogel.kubernetes.dashboard.KubernetesUtils;
+import org.vogel.kubernetes.dashboard.Metadata;
 
 import java.util.ArrayList;
 import java.util.List;

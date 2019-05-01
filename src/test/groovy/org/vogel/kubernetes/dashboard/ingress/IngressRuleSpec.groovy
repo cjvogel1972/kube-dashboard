@@ -1,7 +1,8 @@
-package org.vogel.kubernetes.dashboard
+package org.vogel.kubernetes.dashboard.ingress
 
 import io.kubernetes.client.custom.IntOrString
 import io.kubernetes.client.models.*
+import org.vogel.kubernetes.dashboard.KubernetesUtils
 import spock.lang.Specification
 
 class IngressRuleSpec extends Specification {
