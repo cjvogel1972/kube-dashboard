@@ -1,7 +1,9 @@
-package org.vogel.kubernetes.dashboard;
+package org.vogel.kubernetes.dashboard.deployment;
 
 import io.kubernetes.client.models.*;
 import lombok.Getter;
+import org.vogel.kubernetes.dashboard.Metadata;
+import org.vogel.kubernetes.dashboard.PodTemplate;
 
 import java.util.ArrayList;
 import java.util.List;

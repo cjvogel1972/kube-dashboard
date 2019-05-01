@@ -1,7 +1,10 @@
-package org.vogel.kubernetes.dashboard
+package org.vogel.kubernetes.dashboard.deployment
 
 import io.kubernetes.client.ApiException
 import org.springframework.ui.Model
+import org.vogel.kubernetes.dashboard.KubernetesUtils
+import org.vogel.kubernetes.dashboard.deployment.Deployment
+import org.vogel.kubernetes.dashboard.deployment.DeploymentController
 import spock.lang.Specification
 
 class DeploymentControllerSpec extends Specification {

@@ -1,4 +1,4 @@
-package org.vogel.kubernetes.dashboard;
+package org.vogel.kubernetes.dashboard.deployment;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

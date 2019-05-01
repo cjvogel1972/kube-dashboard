@@ -1,7 +1,8 @@
-package org.vogel.kubernetes.dashboard
+package org.vogel.kubernetes.dashboard.deployment
 
 import io.kubernetes.client.custom.IntOrString
 import io.kubernetes.client.models.*
+import org.vogel.kubernetes.dashboard.deployment.Deployment
 import spock.lang.Specification
 
 class DeploymentSpec extends Specification {
