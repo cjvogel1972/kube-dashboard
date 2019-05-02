@@ -57,14 +57,14 @@ public class Requirement {
             return builder.toString();
         }
 
-        if (equalsAny(operation, "exists", "!")) {
+        if (equalsAny(operation, "in", "notin")) {
             builder.append("(");
         }
 
         String joinedValues = joinListWithCommas(values);
         builder.append(joinedValues);
 
-        if (equalsAny(operation, "exists", "!")) {
+        if (equalsAny(operation, "in", "notin")) {
             builder.append(")");
         }
 
@@ -82,7 +82,7 @@ public class Requirement {
     private void validateLabelValue(String value) throws RequirementException {
         List<String> errs = isValidLabelValue(value);
         if (!errs.isEmpty()) {
-            String errMsg = String.format("invalid label value %s:%s", key, String.join(", ", errs));
+            String errMsg = String.format("invalid label value %s:%s", value, String.join(", ", errs));
             throw new RequirementException(errMsg);
         }
     }
@@ -125,28 +125,30 @@ public class Requirement {
         String[] parts = value.split("/");
 
         String name = "";
-        if (parts.length == 1) {
-            name = parts[0];
-        }
-        if (parts.length == 2) {
-            name = parts[0];
-            String prefix = parts[1];
-            if (prefix.length() == 0) {
-                errs.add("prefix part must be non-empty");
-            } else {
-                List<String> msgs = isDNS1123Subdomain(prefix);
-                if (!msgs.isEmpty()) {
-                    msgs.stream()
-                            .map(msg -> String.format("prefix part %s", msg))
-                            .forEach(errs::add);
+        switch (parts.length) {
+            case 1:
+                name = parts[0];
+                break;
+            case 2:
+                String prefix = parts[0];
+                name = parts[1];
+                if (prefix.length() == 0) {
+                    errs.add("prefix part must be non-empty");
                 } else {
-                    errs.add(String.format(
-                            "a qualified name %s with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')",
-                            regexError(
-                                    "must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character",
-                                    qualifiedNameFmt, "MyName", "my.name", "123-abc")));
+                    List<String> msgs = isDNS1123Subdomain(prefix);
+                    if (!msgs.isEmpty()) {
+                        msgs.stream()
+                                .map(msg -> String.format("prefix part %s", msg))
+                                .forEach(errs::add);
+                    }
                 }
-            }
+                break;
+            default:
+                errs.add(String.format(
+                        "a qualified name %s with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')",
+                        regexError(
+                                "must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character",
+                                qualifiedNameFmt, "MyName", "my.name", "123-abc")));
         }
 
         if (name.length() == 0) {
@@ -172,8 +174,7 @@ public class Requirement {
             errs.add("must be no more than 253 characters");
         }
 
-
-        String dns1123SubdomainFmt = "^(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*";
+        String dns1123SubdomainFmt = "[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*";
         Pattern pattern = Pattern.compile(String.format("^%s$", dns1123SubdomainFmt));
         Matcher matcher = pattern.matcher(value);
         if (!matcher.matches()) {
@@ -186,10 +187,6 @@ public class Requirement {
     }
 
     private String regexError(String msg, String fmt, String... exampleChoices) {
-        if (exampleChoices.length == 0) {
-            return String.format("%s (regex used for validation is '%s')", msg, fmt);
-        }
-
         String examples = Arrays.stream(exampleChoices)
                 .map(ex -> String.format("'%s' ", ex))
                 .collect(joining(", or "));
