@@ -45,7 +45,7 @@ public class PersistentVolumeClaimController {
             model.addAttribute("persistentVolumeClaim", persistentVolumeClaim);
             model.addAttribute("persistentVolumeClaimName", persistentVolumeClaimName);
             model.addAttribute("events",
-                               kubeUtils.getEvents(namespace, "PersistentVolume", persistentVolumeClaimName,
+                               kubeUtils.getEvents(namespace, "PersistentVolumeClaim", persistentVolumeClaimName,
                                                    persistentVolumeClaim.getUid()));
             model.addAttribute("namespace", namespace);
             return "persistent_volume_claim_describe";
