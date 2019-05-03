@@ -1,4 +1,4 @@
-package org.vogel.kubernetes.dashboard;
+package org.vogel.kubernetes.dashboard.persistentvolumeclaim;
 
 import io.kubernetes.client.models.V1PersistentVolumeClaimCondition;
 import lombok.Getter;

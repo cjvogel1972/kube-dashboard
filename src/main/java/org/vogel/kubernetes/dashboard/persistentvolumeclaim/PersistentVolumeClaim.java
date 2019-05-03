@@ -1,4 +1,4 @@
-package org.vogel.kubernetes.dashboard;
+package org.vogel.kubernetes.dashboard.persistentvolumeclaim;
 
 import io.kubernetes.client.custom.Quantity;
 import io.kubernetes.client.models.V1ObjectMeta;
@@ -7,6 +7,7 @@ import io.kubernetes.client.models.V1PersistentVolumeClaimSpec;
 import io.kubernetes.client.models.V1PersistentVolumeClaimStatus;
 import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
+import org.vogel.kubernetes.dashboard.Metadata;
 
 import java.util.List;
 import java.util.Map;

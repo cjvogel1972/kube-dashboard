@@ -1,7 +1,8 @@
-package org.vogel.kubernetes.dashboard
+package org.vogel.kubernetes.dashboard.persistentvolumeclaim
 
 import io.kubernetes.client.ApiException
 import org.springframework.ui.Model
+import org.vogel.kubernetes.dashboard.KubernetesUtils
 import spock.lang.Specification
 
 class PersistentVolumeClaimControllerSpec extends Specification {

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.vogel.kubernetes.dashboard.configmap.ConfigMap;
 import org.vogel.kubernetes.dashboard.deployment.Deployment;
 import org.vogel.kubernetes.dashboard.ingress.Ingress;
+import org.vogel.kubernetes.dashboard.persistentvolumeclaim.PersistentVolumeClaim;
 import org.vogel.kubernetes.dashboard.replicaset.ReplicaSet;
 import org.vogel.kubernetes.dashboard.service.Service;
 
