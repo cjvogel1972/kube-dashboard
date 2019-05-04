@@ -1,4 +1,4 @@
-package org.vogel.kubernetes.dashboard
+package org.vogel.kubernetes.dashboard.persistentvolume
 
 import io.kubernetes.client.custom.Quantity
 import io.kubernetes.client.models.*

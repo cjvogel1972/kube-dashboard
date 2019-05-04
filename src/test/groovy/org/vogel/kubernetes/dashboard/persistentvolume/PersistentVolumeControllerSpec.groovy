@@ -1,7 +1,8 @@
-package org.vogel.kubernetes.dashboard
+package org.vogel.kubernetes.dashboard.persistentvolume
 
 import io.kubernetes.client.ApiException
 import org.springframework.ui.Model
+import org.vogel.kubernetes.dashboard.KubernetesUtils
 import spock.lang.Specification
 
 class PersistentVolumeControllerSpec extends Specification {
