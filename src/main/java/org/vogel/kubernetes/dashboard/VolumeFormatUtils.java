@@ -400,17 +400,17 @@ public class VolumeFormatUtils {
     }
 
     public static Map<String, String> printFlexVolumeSource(V1FlexVolumeSource flex) {
-        return printStorageOS(flex.getDriver(), flex.getFsType(), flex.getSecretRef()
+        return printFlex(flex.getDriver(), flex.getFsType(), flex.getSecretRef()
                 .getName(), flex.isReadOnly(), flex.getOptions());
     }
 
     public static Map<String, String> printFlexPersistentVolumeSource(V1FlexPersistentVolumeSource flex) {
-        return printStorageOS(flex.getDriver(), flex.getFsType(), flex.getSecretRef()
+        return printFlex(flex.getDriver(), flex.getFsType(), flex.getSecretRef()
                 .getName(), flex.isReadOnly(), flex.getOptions());
     }
 
-    private static Map<String, String> printStorageOS(String driver, String fsType, String name, Boolean readOnly,
-                                                      Map<String, String> options) {
+    private static Map<String, String> printFlex(String driver, String fsType, String name, Boolean readOnly,
+                                                 Map<String, String> options) {
         Map<String, String> info = new LinkedHashMap<>();
         info.put("Type:",
                  "FlexVolume (a generic volume resource that is provisioned/attached using an exec based plugin)");
