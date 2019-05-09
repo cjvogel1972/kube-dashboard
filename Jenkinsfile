@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('run sonar') {
             steps {
-                 withSonarQubeEnv {
+                 withSonarQubeEnv('Sonar7.7') {
                      sh 'gradle sonarqube'
                  }
            }
