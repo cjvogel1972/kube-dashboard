@@ -10,6 +10,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "org.sonarqube" version "2.7"
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
@@ -24,7 +28,6 @@ sourceCompatibility = 9
 repositories {
     mavenCentral()
 }
-
 
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-actuator')
