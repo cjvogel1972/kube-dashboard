@@ -39,6 +39,40 @@ class ServiceSpec extends Specification {
         service.loadBalancerSourceRanges == null
     }
 
+    def "test creating a Service mainly empty ports null"() {
+        given:
+        def kubeService = Mock(V1Service)
+        def metadata = Mock(V1ObjectMeta)
+        kubeService.metadata >> metadata
+        def serviceSpec = Mock(V1ServiceSpec)
+        serviceSpec.type >> "foo"
+        serviceSpec.ports >> null
+        kubeService.spec >> serviceSpec
+        def serviceStatus = Mock(V1ServiceStatus)
+        def loadBalancerStatus = Mock(V1LoadBalancerStatus)
+        serviceStatus.loadBalancer >> loadBalancerStatus
+        kubeService.status >> serviceStatus
+
+        when:
+        def service = new Service(kubeService)
+
+        then:
+        service.svcType == "foo"
+        service.clusterIp == "<none>"
+        service.externalIp == "<unknown>"
+        service.ports == "<none>"
+        service.selector == null
+        service.specExternalIp == null
+        service.loadBalancerIp == null
+        service.externalName == null
+        service.loadBalancerIngress == null
+        service.servicePorts == null
+        service.sessionAffinity == null
+        service.externalTrafficPolicy == null
+        service.healthCheckNodePort == 0
+        service.loadBalancerSourceRanges == null
+    }
+
     def "test creating a Service NodePort"() {
         given:
         def kubeService = Mock(V1Service)
