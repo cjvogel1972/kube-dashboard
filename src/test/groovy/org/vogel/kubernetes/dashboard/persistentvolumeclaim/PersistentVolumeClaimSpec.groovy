@@ -95,4 +95,38 @@ class PersistentVolumeClaimSpec extends Specification {
         pvc.volumeMode == null
         pvc.conditions == null
     }
+
+    def "creating a PersistentVolumeClaim storage capacity is null"() {
+        given:
+        def kubePersistentVolumeClaim = Mock(V1PersistentVolumeClaim)
+        def metadata = Mock(V1ObjectMeta)
+        metadata.annotations >> ['volume.beta.kubernetes.io/storage-class': 'foo']
+        def deletionTimestamp = DateTime.now()
+        metadata.deletionTimestamp >> deletionTimestamp
+        metadata.finalizers >> ["foo", "bar"]
+        kubePersistentVolumeClaim.metadata >> metadata
+        def spec = Mock(V1PersistentVolumeClaimSpec)
+        spec.accessModes >> ["ReadWriteMany"]
+        spec.volumeName >> "mount"
+        kubePersistentVolumeClaim.spec >> spec
+        def status = Mock(V1PersistentVolumeClaimStatus)
+        status.capacity >> null
+        def claimCondition = Mock(V1PersistentVolumeClaimCondition)
+        status.conditions >> [claimCondition]
+        kubePersistentVolumeClaim.status >> status
+
+        when:
+        def pvc = new PersistentVolumeClaim(kubePersistentVolumeClaim)
+
+        then:
+        pvc.status == "Terminating"
+        pvc.volume == "mount"
+        pvc.capacity == "0"
+        pvc.accessModes == "RWX"
+        pvc.storageClass == "foo"
+        pvc.deletionTimestamp == "0s"
+        pvc.finalizers == "[foo, bar]"
+        pvc.volumeMode == null
+        pvc.conditions.size() == 1
+    }
 }

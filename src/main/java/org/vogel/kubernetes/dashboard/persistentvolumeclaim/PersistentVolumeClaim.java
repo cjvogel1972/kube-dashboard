@@ -45,9 +45,14 @@ public class PersistentVolumeClaim extends Metadata {
         accessModes = "";
         if (isNotEmpty(volume)) {
             accessModes = getAccessModesAsString(pvcSpec.getAccessModes());
-            Quantity storage = pvcStatus.getCapacity()
-                    .get("storage");
-            capacity = storage.toSuffixedString();
+            Map<String, Quantity> pvcStatusCapacity = pvcStatus.getCapacity();
+            if (pvcStatusCapacity != null) {
+                Quantity storage = pvcStatus.getCapacity()
+                        .get("storage");
+                capacity = storage.toSuffixedString();
+            } else {
+                capacity = "0";
+            }
         }
         storageClass = getPersistentVolumeClaimClass(pvc);
 
